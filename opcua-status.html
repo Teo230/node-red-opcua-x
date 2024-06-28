@@ -1,0 +1,26 @@
+<script type="text/javascript">
+    RED.nodes.registerType('opcua-status',{
+        category: 'opcuax',
+        color: '#a6bbcf',
+        defaults: {
+            client: {value:"", required: true, type:"opcua-client"}
+        },
+        inputs: 0,
+        outputs: 1,
+        icon: "opcua-logo.png",
+        label: function() {
+            return this.defaults.client.name;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="opcua-status">
+    <div class="form-row">
+        <label for="node-input-client"><i class="fa fa-tag"></i> Host</label>
+        <input type="text" id="node-input-client" placeholder="">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="opcua-status">
+    <p>Check OPC UA Server Status</p>
+</script>

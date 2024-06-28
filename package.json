@@ -1,0 +1,13 @@
+{
+    "name": "node-red-opcua-x",
+    "node-red": {
+        "nodes": {
+            "opcua-client": "opcua-client.js",
+            "opcua-status": "opcua-status.js",
+            "opcua-read": "opcua-read.js"
+        }
+    },
+    "dependencies": {
+        "node-opcua": "^2.127.1"
+    }
+}

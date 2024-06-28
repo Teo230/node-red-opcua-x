@@ -1,0 +1,24 @@
+<script type="text/javascript">
+    RED.nodes.registerType('opcua-client',{
+        category: 'config',
+        defaults: {
+            name: {required: true},
+            host: {value:"opc.tcp://", required:true},
+            // port: {value:1234,required:true,validate:RED.validators.number()},
+        },
+        label: function() {
+            return this.name;
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="opcua-client">
+    <div class="form-row">
+        <label for="node-config-input-name"><i class="fa fa-bookmark"></i> Name</label>
+        <input type="text" id="node-config-input-name">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-host"><i class="fa fa-bookmark"></i> Host</label>
+        <input type="text" id="node-config-input-host">
+    </div>
+</script>
