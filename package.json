@@ -8,6 +8,7 @@
         }
     },
     "dependencies": {
-        "node-opcua": "^2.127.1"
+        "node-opcua": "^2.127.1",
+        "node-persist": "^4.0.1"
     }
 }
