@@ -3,15 +3,20 @@ module.exports = function(RED) {
     function ReadOpcUaNode(args) {
 
         RED.nodes.createNode(this,args);
+        const clientNode = RED.nodes.getNode(args.client);
+
         var node = this;
 
         node.name = args.name;
-        node.client = args.client;
-        node.nodeId = args.nodeId;
+        node.nodeId = args.nodeid;
 
         // Read Input Arg node
         node.on('input', function(msg) {
-            msg.payload = "Hello World";
+            
+            // Override nodeId from incoming node if not defined on read node
+            if(!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
+
+            var value = node.client.session;
             node.send(msg);
         });
     }
