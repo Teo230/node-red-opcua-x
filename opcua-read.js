@@ -1,9 +1,13 @@
 module.exports = function(RED) {
 
-    function ReadOpcUaNode(config) {
+    function ReadOpcUaNode(args) {
 
-        RED.nodes.createNode(this,config);
+        RED.nodes.createNode(this,args);
         var node = this;
+
+        node.name = args.name;
+        node.client = args.client;
+        node.nodeId = args.nodeId;
 
         // Read Input Arg node
         node.on('input', function(msg) {
