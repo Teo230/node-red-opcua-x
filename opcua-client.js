@@ -15,13 +15,12 @@ module.exports = function (RED) {
 
     // constructor
     function opcUaClientNode(args) {
-
         RED.nodes.createNode(this, args);
 
         let node = this;
 
         //Initialize persist storage
-        storage.init({dir: `${RED.settings.userDir}/opcua-x/persist`});
+        storage.init({dir: `${RED.settings.userDir}/cache/node-red-opcua-x`});
 
         node.name = args.name; //unique name identifier
         node.host = args.host; //opc.tcp
