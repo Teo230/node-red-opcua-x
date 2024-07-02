@@ -1,16 +1,14 @@
 module.exports = function (RED) {
 
-    //variables placed here are shared by all nodes
-    var storage = require('node-persist');
+    var core = require('./core');
 
     function OpcUaStatusNode(config) {
 
         RED.nodes.createNode(this, config);
+
+        const storage = core.storage;
         let node = this;
         let state = false;
-
-        //Initialize persist storage
-        storage.init({ dir: `${RED.settings.userDir}/cache/node-red-opcua-x` });
 
         setInterval(checkServerConnection, 5000);
 
