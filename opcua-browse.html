@@ -1,0 +1,36 @@
+<script type="text/javascript">
+    RED.nodes.registerType('opcua-browse', {
+        category: 'opcuax',
+        color: '#a6bbcf',
+        defaults: {
+            nodeid: { value: "i=84" },
+            name: { value: "" },
+            client: { value: "", required: true, type: "opcua-client" }
+        },
+        inputs: 1,
+        outputs: 1,
+        icon: "opcua-logo.png",
+        label: function () {
+            return this.name || "opcua-browse";
+        }
+    });
+</script>
+
+<script type="text/html" data-template-name="opcua-browse">
+    <div class="form-row">
+        <label for="node-input-name"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
+        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*">
+    </div>
+    <div class="form-row">
+        <label for="node-input-client"><i class="fa fa-plug"></i> Client</label>
+        <input type="text" id="node-input-client" placeholder="">
+    </div>
+</script>
+
+<script type="text/html" data-help-name="opcua-read">
+    <p>Simple Hello World node</p>
+</script>
