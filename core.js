@@ -17,7 +17,7 @@ core.createOpcUaClient = function(name){
     const connectionStrategy = {
         initialDelay: 1000,
         maxDelay: 10000,
-        maxRetry: 100
+        maxRetry: 3
     };
     
     core.opcClient = core.opcua.OPCUAClient.create({

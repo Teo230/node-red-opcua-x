@@ -18,7 +18,15 @@ module.exports = function (RED) {
             storage.getItem("client-connected").then((value) => {
                 if (state === value) return;
                 state = value;
+
+                if(state){
+                    node.status({fill:"green",shape:"dot",text:"connected"});
+                }else{
+                    node.status({fill:"red",shape:"ring",text:"disconnected"});
+                }
+                
                 var msg = { payload: state ? 'connected' : 'disconnected' };
+
                 node.send(msg);
             });
         }

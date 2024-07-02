@@ -22,6 +22,7 @@ module.exports = function (RED) {
         connect();
 
         node.on('close', onNodeClosed);
+        node.on('error', onNodeError);
 
         //#region Methods
 
@@ -60,6 +61,14 @@ module.exports = function (RED) {
                 node.error(err);
             }
             done();
+        }
+
+        function onNodeError(){
+            try{
+                core.close();
+            }catch(err){
+                node.error(err);
+            }
         }
 
         //#endregion
