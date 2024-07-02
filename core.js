@@ -38,4 +38,9 @@ core.connect = async function(host){
     core.opcSession = await core.opcClient.createSession();
 }
 
+core.close = async function(){
+    await core.opcSession.close();
+    core.opcSession = null;
+}
+
 module.exports = core

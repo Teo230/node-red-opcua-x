@@ -21,6 +21,8 @@ module.exports = function (RED) {
         // Connect client
         connect();
 
+        node.on('close', onNodeClosed);
+
         //#region Methods
 
         async function connect() {
@@ -49,6 +51,15 @@ module.exports = function (RED) {
             if (connected) node.debug("client has reconnected");
             else node.debug("client has lost connection");
             core.storage.setItem("client-connected", connected);
+        }
+
+        async function onNodeClosed(done){
+            try{
+                await core.close();
+            }catch(err){
+                node.error(err);
+            }
+            done();
         }
 
         //#endregion
