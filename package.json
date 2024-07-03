@@ -1,6 +1,6 @@
 {
     "name": "node-red-opcua-x",
-    "version": "alpha-1.0",
+    "version": "1.0-alpha",
     "node-red": {
         "nodes": {
             "opcua-client": "opcua-client.js",
