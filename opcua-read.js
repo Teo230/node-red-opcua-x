@@ -15,6 +15,11 @@ module.exports = function (RED) {
         // Read Input Arg node
         node.on('input', function (msg) {
 
+            if(!core.opcSession){
+                node.error("Session not defined");
+                return;
+            }
+
             // Override nodeId from incoming node if not defined on read node
             if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
 

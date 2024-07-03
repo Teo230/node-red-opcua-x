@@ -8,9 +8,9 @@
  */
 var core = core || { opcClient: {} }
 core.opcua = core.opcua || require('node-opcua')
-core.storage = core.storage || require('node-persist')
 core.opcClient = core.opcClient || new core.opcua.OPCUAClient();
 core.opcSession = core.opcSession || null
+core.opcClientStatus = core.opcClientStatus || "disconnected"
 
 core.createOpcUaClient = function(name){
     // caused the connect method to fail after one single unsuccessful retry
@@ -35,11 +35,13 @@ core.createOpcUaClient = function(name){
 
 core.connect = async function(host){
     await core.opcClient.connect(host);
+    core.opcClientStatus = "connected";
     core.opcSession = await core.opcClient.createSession();
 }
 
 core.close = async function(){
     await core.opcSession.close();
+    core.opcClientStatus = "disconnected";
     core.opcSession = null;
 }
 

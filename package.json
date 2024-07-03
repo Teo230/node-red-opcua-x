@@ -1,6 +1,6 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.1.0",
+    "version": "0.2.0",
     "node-red": {
         "nodes": {
             "opcua-client": "opcua-client.js",
@@ -10,7 +10,6 @@
         }
     },
     "dependencies": {
-        "node-opcua": "^2.127.1",
-        "node-persist": "^4.0.1"
+        "node-opcua": "^2.127.1"
     }
 }

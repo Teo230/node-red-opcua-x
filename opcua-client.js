@@ -8,9 +8,6 @@ module.exports = function (RED) {
 
         let node = this;
 
-        //Initialize persist storage
-        core.storage.init({dir: `${RED.settings.userDir}/cache/node-red-opcua-x`});
-
         node.name = args.name; //unique name identifier
         node.host = args.host; //opc.tcp
 
@@ -29,17 +26,16 @@ module.exports = function (RED) {
         async function connect() {
             try {
 
-                opcClient.on("abort", () => node.debug("client has aborted"));
-                opcClient.on("close", () => node.debug("client has closed"));
-                opcClient.on("connection_reestablished", () => sendClientConnectionStatus(true));
-                opcClient.on("connection_lost", () => sendClientConnectionStatus(false));
-                opcClient.on("start_reconnection", () => node.debug("client is trying to reconnect"));
-                opcClient.on("after_reconnection", () => node.debug("client start reconnection"));
+                opcClient.on("abort", () => sendClientConnectionStatus("disconnected"));
+                opcClient.on("close", () => sendClientConnectionStatus("disconnected"));
+                opcClient.on("connection_reestablished", () => sendClientConnectionStatus("connected"));
+                opcClient.on("connection_lost", () => sendClientConnectionStatus("disconnected"));
+                opcClient.on("start_reconnection", () => sendClientConnectionStatus("reconnecting"));
+                opcClient.on("after_reconnection", () => sendClientConnectionStatus("reconnecting"));
         
                 await core.connect(node.host);
-                sendClientConnectionStatus(true);
 
-                core.opcSession.on("session_closed", () => node.debug("session has closed"));
+                core.opcSession.on("session_closed", () => sendClientConnectionStatus("disconnected"));
                 // core.opcSession.on("keepalive", () => node.debug("session keepalive"));
                 // core.opcSession.on("keepalive_failure", () => node.debug("session keepalive failure"));
 
@@ -48,10 +44,20 @@ module.exports = function (RED) {
             }
         }
 
-        function sendClientConnectionStatus(connected) {
-            if (connected) node.debug("client has reconnected");
-            else node.debug("client has lost connection");
-            core.storage.setItem("client-connected", connected);
+        function sendClientConnectionStatus(status) {
+            switch(status){
+                case "connected":
+                    node.debug("client has reconnected");
+                    break;
+                case "reconnecting":
+                    node.debug("client is trying to reconnect");
+                    break
+                case "disconnected":
+                    node.debug("client has lost connection");
+                    break;
+            }
+
+            core.opcClientStatus = status;
         }
 
         async function onNodeClosed(done){

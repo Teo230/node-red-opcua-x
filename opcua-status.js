@@ -6,29 +6,30 @@ module.exports = function (RED) {
 
         RED.nodes.createNode(this, config);
 
-        const storage = core.storage;
         let node = this;
         let state = false;
 
         setInterval(checkServerConnection, 5000);
 
         function checkServerConnection() {
-            if (storage === null || storage === undefined) return;
+            if (state === core.opcClientStatus) return;
+            state = core.opcClientStatus;
 
-            storage.getItem("client-connected").then((value) => {
-                if (state === value) return;
-                state = value;
+            switch(state){
+                case "connected":
+                    node.status({ fill: "green", shape: "dot", text: "connected" });
+                    break;
+                case "reconnecting":
+                    node.status({ fill: "yellow", shape: "ring", text: "reconnecting" });
+                    break;
+                case "disconnected":
+                default:
+                    node.status({ fill: "red", shape: "ring", text: "disconnected" });
+            }
 
-                if(state){
-                    node.status({fill:"green",shape:"dot",text:"connected"});
-                }else{
-                    node.status({fill:"red",shape:"ring",text:"disconnected"});
-                }
-                
-                var msg = { payload: state ? 'connected' : 'disconnected' };
+            var msg = { payload: state };
 
-                node.send(msg);
-            });
+            node.send(msg);
         }
 
     }
