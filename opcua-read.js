@@ -3,7 +3,7 @@ module.exports = function (RED) {
     var core = require('./core');
     var opcua = require('node-opcua');
 
-    function ReadOpcUaNode(args) {
+    function opcUaReadNode(args) {
 
         RED.nodes.createNode(this, args);
 
@@ -33,5 +33,5 @@ module.exports = function (RED) {
         }
     }
 
-    RED.nodes.registerType("opcua-read", ReadOpcUaNode);
+    RED.nodes.registerType("opcua-read", opcUaReadNode);
 }

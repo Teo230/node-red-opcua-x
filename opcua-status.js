@@ -2,7 +2,7 @@ module.exports = function (RED) {
 
     var core = require('./core');
 
-    function OpcUaStatusNode(config) {
+    function opcUaStatusNode(config) {
 
         RED.nodes.createNode(this, config);
 
@@ -33,5 +33,5 @@ module.exports = function (RED) {
 
     }
 
-    RED.nodes.registerType("opcua-status", OpcUaStatusNode);
+    RED.nodes.registerType("opcua-status", opcUaStatusNode);
 }
