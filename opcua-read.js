@@ -33,9 +33,9 @@ module.exports = function (RED) {
                 attributeId: opcua.AttributeIds.Value
             };
             const dataValue = await opcClient.session.read(nodeToRead);
-            const value = dataValue.value;
-            const statusCode = dataValue.statusCode;
-            node.send({ payload: value });
+            const dataValueString = JSON.stringify(dataValue);
+            const dataValueObj = JSON.parse(dataValueString);
+            node.send({ payload: dataValueObj });
         }
     }
 
