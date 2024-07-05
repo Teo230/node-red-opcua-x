@@ -4,6 +4,7 @@ module.exports = function (RED) {
 
     function opcUaBrowseNode(args) {
         RED.nodes.createNode(this, args);
+        const opcuaclientnode = RED.nodes.getNode(args.client);
 
         let node = this;
 
@@ -12,15 +13,20 @@ module.exports = function (RED) {
 
         // Read Input Arg node
         node.on('input', function (msg) {
+            const existingClient = core.opcClients[opcuaclientnode.connectionId];
+            if(!existingClient){
+                node.error("OPC UA Client not defined");
+                return;
+            }
 
             // Override nodeId from incoming node if not defined on read node
             if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
 
-            browseNode();
+            browseNode(existingClient);
         });
 
-        async function browseNode() {
-            const browseResult = await core.opcSession.browse(node.nodeId);
+        async function browseNode(opcClient) {
+            const browseResult = await opcClient.session.browse(node.nodeId);
 
             items = [browseResult.references.length];
             for (const index in browseResult.references) {

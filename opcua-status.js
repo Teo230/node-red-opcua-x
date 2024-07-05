@@ -5,30 +5,35 @@ module.exports = function (RED) {
     function opcUaStatusNode(config) {
 
         RED.nodes.createNode(this, config);
+        const opcuaclientnode = RED.nodes.getNode(config.client);
 
         let node = this;
         let state = false;
 
-        setInterval(checkServerConnection, 5000);
+        setInterval(checkServerConnection, 1000);
 
         function checkServerConnection() {
-            if (state === core.opcClientStatus) return;
-            state = core.opcClientStatus;
+            const existingClient = core.opcClients[opcuaclientnode.connectionId];
+            if (existingClient) {
+                if (state === existingClient.clientState) return;
+                state = existingClient.clientState;
 
-            switch(state){
-                case "connected":
-                    node.status({ fill: "green", shape: "dot", text: "connected" });
-                    break;
-                case "reconnecting":
-                    node.status({ fill: "yellow", shape: "ring", text: "reconnecting" });
-                    break;
-                case "disconnected":
-                default:
-                    node.status({ fill: "red", shape: "ring", text: "disconnected" });
+                switch (state) {
+                    case "connected":
+                        node.status({ fill: "green", shape: "dot", text: "connected" });
+                        break;
+                    case "reconnecting":
+                        node.status({ fill: "yellow", shape: "ring", text: "reconnecting" });
+                        break;
+                    case "disconnected":
+                    default:
+                        node.status({ fill: "red", shape: "ring", text: "disconnected" });
+                }
+            } else {
+                state = "disconnected";
             }
 
             var msg = { payload: state };
-
             node.send(msg);
         }
 
