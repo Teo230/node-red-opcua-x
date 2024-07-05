@@ -14,6 +14,7 @@ A package that handles OPC UA Client request like read, browse, write, ...
 - [ ] Subscription
 - [ ] Events
 - [ ] Methods
+- [x] Connection security access
 
 # Getting started
 From node-red search for `node-red-opcua-x`

@@ -10,7 +10,7 @@ var core = core || { opcClients: [] }
 core.opcua = core.opcua || require('node-opcua')
 core.opcClients = core.opcClients || {}
 
-core.createOpcUaClient = function (connectionId, name) {
+core.createOpcUaClient = function (connectionId, name, authOption) {
     // caused the connect method to fail after one single unsuccessful retry
     const connectionStrategy = {
         initialDelay: 1000,
@@ -26,8 +26,8 @@ core.createOpcUaClient = function (connectionId, name) {
         keepSessionAlive: true,
         keepAliveInterval: 5000,
         connectionStrategy: connectionStrategy,
-        securityMode: core.opcua.MessageSecurityMode.None, // TODO
-        securityPolicy: core.opcua.SecurityPolicy.None, //TODO
+        securityMode: authOption.securityMode,
+        securityPolicy: authOption.securityPolicy,
         endpointMustExist: false
     });
     core.opcClients[connectionId] = newClient;
@@ -35,7 +35,7 @@ core.createOpcUaClient = function (connectionId, name) {
     return newClient;
 }
 
-core.connect = async function (connectionId, host) {
+core.connect = async function (connectionId, host, userOption) {
     const existingClient = core.opcClients[connectionId];
     if (!existingClient) return;
 
@@ -49,14 +49,14 @@ core.connect = async function (connectionId, host) {
     try{
         await existingClient.connect(host);
 
-        const session = await existingClient.createSession();
+        const session = await existingClient.createSession(userOption);
         session.on("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
         // session.on("keepalive", () => node.debug(connectionId, "session keepalive"));
         // session.on("keepalive_failure", () => node.debug(connectionId, "session keepalive failure"));    
         existingClient['session'] = session;
     }
     catch(err){
-        console.error(err);
+        console.error(err.message);
         updateClientConnectionStatus(connectionId, "disconnected");
         return;
     }
@@ -70,16 +70,16 @@ core.close = async function (connectionId) {
     if (!existingClient) return;
 
     let session = existingClient.session;
-    if (!session) return;
 
     try{
-        session.removeListener("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
+        if(session){       
+            session.removeListener("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
 
-        await session.close();
+            await session.close();
 
-        session = null;
-        existingClient.session = null;
-
+            session = null;
+            existingClient.session = null;
+        }
         // detach all events before destroy client
         existingClient.removeListener("abort", () => updateClientConnectionStatus(connectionId, "disconnected"));
         existingClient.removeListener("close", () => updateClientConnectionStatus(connectionId, "disconnected"));
@@ -96,7 +96,7 @@ core.close = async function (connectionId) {
         core.opcClients[connectionId] = null;
 
     }catch(err){
-        console.error(err);
+        console.error(err.message);
     }
 }
 

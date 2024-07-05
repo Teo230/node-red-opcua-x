@@ -2,14 +2,50 @@
     RED.nodes.registerType('opcua-client', {
         category: 'config',
         defaults: {
-            name: { value: "localhost", required: true },
-            host: { value: "opc.tcp://localhost:4840/", required: true },
-            // port: {value:1234,required:true,validate:RED.validators.number()},
+            name: { required: true },
+            host: { required: true },
+            securitypolicy: { value: "None", required: true },
+            messagesecurity: { value: "None", required: true },
+            anonymous: { value: true, required: false },
+            username: { required: false },
+            password: { required: false }
         },
         label: function () {
             return this.name;
+        },
+        oneditprepare: function () {
+            $("#node-config-input-securitypolicy").typedInput({
+                types: [
+                    {
+                        options: [
+                            { value: "None", label: "None" },
+                            { value: "Basic256", label: "Basic256" },
+                            { value: "Basic256Sha256", label: "Basic256Sha256" }
+                        ]
+                    }
+                ]
+            });
+
+            $("#node-config-input-messagesecurity").typedInput({
+                types: [
+                    {
+                        options: [
+                            { value: "None", label: "None" },
+                            { value: "Sign", label: "Sign" },
+                            { value: "SignAndEncrypt", label: "Sign&Encrypt" }
+                        ]
+                    }
+                ]
+            });
+
+            $("#node-config-input-anonymous").on('change', function (event) {
+                const value = $("#node-config-input-anonymous")[0].checked;
+                $("#node-config-input-username")[0].readOnly = value;
+                $("#node-config-input-password")[0].readOnly = value;
+            });
         }
     });
+
 </script>
 
 <script type="text/html" data-template-name="opcua-client">
@@ -19,6 +55,27 @@
     </div>
     <div class="form-row">
         <label for="node-config-input-host"><i class="fa fa-server"></i> Host</label>
-        <input type="text" id="node-config-input-host">
+        <input type="text" id="node-config-input-host" placeholder="opc.tcp://localhost:4840/">
+    </div>
+    <h4>Authentication Settings</h4>
+    <div class="form-row">
+        <label for="node-config-input-securitypolicy"><i class="fa fa-lock"></i> Security Policy</label>
+        <input type="text" id="node-config-input-securitypolicy">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-messagesecurity"><i class="fa fa-envelope"></i> Message Security Mode</label>
+        <input type="text" id="node-config-input-messagesecurity">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-anonymous">Anonymous</label>
+        <input type="checkbox" id="node-config-input-anonymous" style="margin: 5px 0px; width: auto;">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-username">Username</label>
+        <input type="text" id="node-config-input-username">
+    </div>
+    <div class="form-row">
+        <label for="node-config-input-password">Password</label>
+        <input type="password" id="node-config-input-password">
     </div>
 </script>

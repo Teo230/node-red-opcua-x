@@ -1,6 +1,7 @@
 module.exports = function (RED) {
 
     var core = require('./core');
+    var opcua = require('node-opcua');
 
     // constructor
     function opcUaClientNode(args) {
@@ -13,8 +14,13 @@ module.exports = function (RED) {
         node.host = args.host; //opc.tcp
 
         // Setup client
+        const authOption = {
+            securityPolicy: opcua.SecurityPolicy[args.securitypolicy],
+            securityMode: opcua.MessageSecurityMode[args.messagesecurity],
+        }
+
         node.debug('Setup opc client for ' + node.name);
-        const opcClient = core.createOpcUaClient(node.connectionId, node.name);
+        const opcClient = core.createOpcUaClient(node.connectionId, node.name, authOption);
 
         // Connect client
         connect();
@@ -25,7 +31,12 @@ module.exports = function (RED) {
         //#region Methods
 
         async function connect() {
-            await core.connect(node.connectionId, node.host);
+            const userOption = {
+                type: args.anonymous ? opcua.UserTokenType.Anonymous : opcua.UserTokenType.UserName,
+                userName:  args.username,
+                password: args.password
+            }
+            await core.connect(node.connectionId, node.host, userOption);
         }
 
         async function onNodeClosed(done){
