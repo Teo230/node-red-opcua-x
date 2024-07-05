@@ -1,6 +1,6 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.3.0",
+    "version": "0.3.1",
     "node-red": {
         "nodes": {
             "opcua-client": "opcua-client.js",
@@ -9,6 +9,17 @@
             "opcua-browse": "opcua-browse.js"
         }
     },
+    "keywords":[
+        "node-red",
+        "opcua",
+        "opc-ua",
+        "javascript",
+        "js",
+        "npm",
+        "opc-ua-client",
+        "opcua-client",
+        "node-opcua"
+    ],
     "dependencies": {
         "node-opcua": "^2.127.1"
     }
