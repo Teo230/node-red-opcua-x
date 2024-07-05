@@ -16,6 +16,8 @@ A package that handles OPC UA Client request like read, browse, write, ...
 - [ ] Methods
 
 # Getting started
+From node-red search for `node-red-opcua-x`
+
 Run command on Node-RED installation directory.
 	
     npm i node-red-opcua-x

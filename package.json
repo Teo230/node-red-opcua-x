@@ -1,7 +1,16 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.3.1",
+    "version": "0.3.2",
+    "license": "MIT",
+    "author": {
+        "name": "Teo230",
+        "email": "teeassassin230@gmail.com"
+    },
+    "engines": {
+        "node": ">=20.14.0"
+    },
     "node-red": {
+        "version": ">=2.0.0",
         "nodes": {
             "opcua-client": "opcua-client.js",
             "opcua-status": "opcua-status.js",
@@ -9,7 +18,7 @@
             "opcua-browse": "opcua-browse.js"
         }
     },
-    "keywords":[
+    "keywords": [
         "node-red",
         "opcua",
         "opc-ua",
@@ -20,6 +29,9 @@
         "opcua-client",
         "node-opcua"
     ],
+    "bugs": {
+        "url": "https://github.com/Teo230/node-red-opcua-x/issues"
+    },
     "dependencies": {
         "node-opcua": "^2.127.1"
     }
