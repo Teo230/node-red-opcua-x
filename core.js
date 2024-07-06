@@ -46,16 +46,18 @@ core.connect = async function (connectionId, host, userOption) {
     existingClient.on("start_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
     existingClient.on("after_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
 
-    try{
+    try {
         await existingClient.connect(host);
 
         const session = await existingClient.createSession(userOption);
-        session.on("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
+        // session.on("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
         // session.on("keepalive", () => node.debug(connectionId, "session keepalive"));
         // session.on("keepalive_failure", () => node.debug(connectionId, "session keepalive failure"));    
         existingClient['session'] = session;
+
+        core.createSubscription(session);
     }
-    catch(err){
+    catch (err) {
         console.error(err.message);
         updateClientConnectionStatus(connectionId, "disconnected");
         return;
@@ -69,17 +71,9 @@ core.close = async function (connectionId) {
     let existingClient = core.opcClients[connectionId];
     if (!existingClient) return;
 
-    let session = existingClient.session;
+    try {
+        await closeSession(existingClient);
 
-    try{
-        if(session){       
-            session.removeListener("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
-
-            await session.close();
-
-            session = null;
-            existingClient.session = null;
-        }
         // detach all events before destroy client
         existingClient.removeListener("abort", () => updateClientConnectionStatus(connectionId, "disconnected"));
         existingClient.removeListener("close", () => updateClientConnectionStatus(connectionId, "disconnected"));
@@ -87,17 +81,55 @@ core.close = async function (connectionId) {
         existingClient.removeListener("connection_lost", () => updateClientConnectionStatus(connectionId, "disconnected"));
         existingClient.removeListener("start_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
         existingClient.removeListener("after_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
-    
-        if(!existingClient.isReconnecting){
+
+        if (!existingClient.isReconnecting) {
             existingClient.disconnect();
         }
 
         existingClient = null;
         core.opcClients[connectionId] = null;
 
-    }catch(err){
+    } catch (err) {
         console.error(err.message);
     }
+}
+
+async function closeSession(client) {
+    let session = client.session;
+    if (!session) return;
+
+    await core.closeSubscription(session);
+
+    await session.close();
+    session = null;
+    client.session = null;
+}
+
+core.closeSubscription = async function(session){
+    let subscription = session.subscription;
+    if(!subscription) return;
+
+    await subscription.terminate();
+    subscription = null;
+    session.subscription = null;
+}
+
+core.createSubscription = function (session) {
+    if (session.subscription) return session.subscription;
+
+    const subscriptionOptions = {
+        requestedPublishingInterval: 1000,
+        requestedLifetimeCount: 100,
+        requestedMaxKeepAliveCount: 10,
+        maxNotificationsPerPublish: 100,
+        publishingEnabled: true,
+        priority: 10
+    };
+
+    const subscription = core.opcua.ClientSubscription.create(session, subscriptionOptions);
+    session['subscription'] = subscription;
+
+    return subscription;
 }
 
 function updateClientConnectionStatus(connectionId, status) {

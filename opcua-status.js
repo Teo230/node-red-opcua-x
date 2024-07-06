@@ -2,10 +2,10 @@ module.exports = function (RED) {
 
     var core = require('./core');
 
-    function opcUaStatusNode(config) {
+    function opcUaStatusNode(args) {
 
-        RED.nodes.createNode(this, config);
-        const opcuaclientnode = RED.nodes.getNode(config.client);
+        RED.nodes.createNode(this, args);
+        const opcuaclientnode = RED.nodes.getNode(args.client);
 
         let node = this;
         let state = false;

@@ -15,7 +15,8 @@
             "opcua-client": "opcua-client.js",
             "opcua-status": "opcua-status.js",
             "opcua-read": "opcua-read.js",
-            "opcua-browse": "opcua-browse.js"
+            "opcua-browse": "opcua-browse.js",
+            "opcua-subscription": "opcua-subscription.js"
         }
     },
     "keywords": [
