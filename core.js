@@ -10,6 +10,9 @@ var core = core || { opcClients: [] }
 core.opcua = core.opcua || require('node-opcua')
 core.opcClients = core.opcClients || {}
 
+const EventEmitter = require('events');
+core.eventEmitter = core.eventEmitter || new EventEmitter()
+
 core.createOpcUaClient = function (connectionId, name, authOption) {
     // caused the connect method to fail after one single unsuccessful retry
     const connectionStrategy = {
@@ -24,7 +27,7 @@ core.createOpcUaClient = function (connectionId, name, authOption) {
     const newClient = core.opcua.OPCUAClient.create({
         applicationName: name,
         keepSessionAlive: true,
-        keepAliveInterval: 5000,
+        keepAliveInterval: 1000,
         connectionStrategy: connectionStrategy,
         securityMode: authOption.securityMode,
         securityPolicy: authOption.securityPolicy,
@@ -37,6 +40,7 @@ core.createOpcUaClient = function (connectionId, name, authOption) {
 
 core.connect = async function (connectionId, host, userOption) {
     const existingClient = core.opcClients[connectionId];
+
     if (!existingClient) return;
 
     existingClient.on("abort", () => updateClientConnectionStatus(connectionId, "disconnected"));
@@ -50,12 +54,21 @@ core.connect = async function (connectionId, host, userOption) {
         await existingClient.connect(host);
 
         const session = await existingClient.createSession(userOption);
-        // session.on("session_closed", () => updateClientConnectionStatus(connectionId, "disconnected"));
-        // session.on("keepalive", () => node.debug(connectionId, "session keepalive"));
-        // session.on("keepalive_failure", () => node.debug(connectionId, "session keepalive failure"));    
+        core.eventEmitter.emit('session_created', connectionId);
+        // session.on("session_closed", (statusCode) => {
+        //     console.log(" Session has been closed with statusCode = ", statusCode.toString());
+        // })
+        // session.on("session_restored", () => {
+        //     console.log(" Session has been restored");
+        // });
+        // session.on("keepalive", (lastKnownServerState) => {
+        //     console.log("KeepAlive lastKnownServerState", core.opcua.ServerState[lastKnownServerState]);
+        // });
+        // session.on("keepalive_failure", () => {
+        //     console.log("KeepAlive failure");
+        // });
         existingClient['session'] = session;
-
-        core.createSubscription(session);
+        core.createSubscription(connectionId, session);
     }
     catch (err) {
         console.error(err.message);
@@ -114,7 +127,7 @@ core.closeSubscription = async function(session){
     session.subscription = null;
 }
 
-core.createSubscription = function (session) {
+core.createSubscription = function (connectionId, session) {
     if (session.subscription) return session.subscription;
 
     const subscriptionOptions = {
@@ -128,6 +141,7 @@ core.createSubscription = function (session) {
 
     const subscription = core.opcua.ClientSubscription.create(session, subscriptionOptions);
     session['subscription'] = subscription;
+    core.eventEmitter.emit('subscription_created', connectionId);
 
     return subscription;
 }
