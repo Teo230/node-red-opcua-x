@@ -11,7 +11,9 @@ module.exports = function (RED) {
 
         let node = this;
         node.nodeId = args.nodeid;
+        node.samplinginterval = args.samplinginterval;
         node.on('close', onNodeClosed);
+
         let monitoredItem = new opcua.ClientMonitoredItem();
 
         core.eventEmitter.on('subscription_created', onSubscriptionCreated);
@@ -32,10 +34,6 @@ module.exports = function (RED) {
                 monitoredItem = null;
             }
 
-            const existingClient = core.opcClients[opcuaclientnode.connectionId];
-
-            if (!existingClient.session) return;
-            await core.closeSubscription(existingClient.session);
             done();
         }
 
@@ -46,7 +44,7 @@ module.exports = function (RED) {
             };
 
             const parameters = {
-                samplingInterval: 100,
+                samplingInterval: node.samplinginterval,
                 discardOldest: true,
                 queueSize: 10
             };
