@@ -1,10 +1,10 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.6.0",
+    "version": "0.7.0",
     "license": "MIT",
     "author": {
         "name": "Teo230",
-        "email": "teeassassin230@gmail.com"
+        "email": "m.f.tim@live.it"
     },
     "homepage": "https://github.com/Teo230/node-red-opcua-x",
     "repository": {
@@ -21,7 +21,8 @@
             "opcua-status": "opcua-status.js",
             "opcua-read": "opcua-read.js",
             "opcua-browse": "opcua-browse.js",
-            "opcua-subscription": "opcua-subscription.js"
+            "opcua-subscription": "opcua-subscription.js",
+            "opcua-write": "opcua-write.js"
         }
     },
     "keywords": [

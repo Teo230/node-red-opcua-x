@@ -161,7 +161,7 @@ function updateClientConnectionStatus(connectionId, status) {
             console.debug(existingClient.applicationName + ":client has lost connection");
             break;
     }
-
+    core.eventEmitter.emit('client_connection_state', connectionId, status);
     existingClient['clientState'] = status;
 }
 

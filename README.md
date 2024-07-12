@@ -20,7 +20,7 @@ The first stable version will start from `1.0.0`
 ## Features
 
 - [x] Read
-- [ ] Write
+- [x] Write
 - [x] Browse
 - [x] Check connection status
 - [x] Subscription

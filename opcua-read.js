@@ -7,6 +7,7 @@ module.exports = function (RED) {
 
         RED.nodes.createNode(this, args);
         const opcuaclientnode = RED.nodes.getNode(args.client);
+        const existingClient = core.opcClients[opcuaclientnode.connectionId];
 
         var node = this;
 
@@ -15,27 +16,21 @@ module.exports = function (RED) {
 
         // Read Input Arg node
         node.on('input', function (msg) {
-            const existingClient = core.opcClients[opcuaclientnode.connectionId];
-            if(!existingClient){
-                node.error("OPC UA Client not defined");
-                return;
-            }
-
             if(existingClient.clientState == "reconnecting") return;
             if(existingClient.clientState == "disconnected") return;
 
             // Override nodeId from incoming node if not defined on read node
             if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
 
-            readNode(existingClient);
+            readNode();
         });
 
-        async function readNode(opcClient) {
+        async function readNode() {
             const nodeToRead = {
                 nodeId: node.nodeId,
                 attributeId: opcua.AttributeIds.Value
             };
-            const dataValue = await opcClient.session.read(nodeToRead);
+            const dataValue = await existingClient.session.read(nodeToRead);
             const dataValueString = JSON.stringify(dataValue);
             const dataValueObj = JSON.parse(dataValueString);
             node.send({ payload: dataValueObj });
