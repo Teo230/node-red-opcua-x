@@ -38,3 +38,11 @@ Run command on Node-RED installation directory.
 or run command for global installation.
 
 	npm i -g node-red-opcua-x
+
+# Getting started - Developing
+
+1. From the cloned folder run `npm i`
+2. Open a new terminal inside the node-red source folder
+3. Execute the following command `npm i <local folder node-red-opcua-x installation>`
+4. Restart node-red
+5. You should be able to see the imported package

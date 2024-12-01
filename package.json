@@ -22,7 +22,8 @@
             "opcua-read": "opcua-read.js",
             "opcua-browse": "opcua-browse.js",
             "opcua-subscription": "opcua-subscription.js",
-            "opcua-write": "opcua-write.js"
+            "opcua-write": "opcua-write.js",
+            "opcua-method": "opcua-method.js"
         }
     },
     "keywords": [
