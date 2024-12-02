@@ -5,6 +5,7 @@ module.exports = function (RED) {
     function opcUaBrowseNode(args) {
         RED.nodes.createNode(this, args);
         const opcuaclientnode = RED.nodes.getNode(args.client);
+        const existingClient = core.opcClients[opcuaclientnode.connectionId];
 
         let node = this;
 
@@ -13,9 +14,14 @@ module.exports = function (RED) {
 
         // Read Input Arg node
         node.on('input', function (msg) {
-            const existingClient = core.opcClients[opcuaclientnode.connectionId];
-            if(!existingClient){
+
+            if (!existingClient) {
                 node.error("OPC UA Client not defined");
+                return;
+            }
+
+            if (existingClient.session == undefined) {
+                node.error("Session not found");
                 return;
             }
 

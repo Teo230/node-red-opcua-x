@@ -20,6 +20,11 @@ module.exports = function (RED) {
             if(existingClient.clientState == "reconnecting") return;
             if(existingClient.clientState == "disconnected") return;
 
+            if (existingClient.session == undefined) {
+                node.error("Session not found");
+                return;
+            }
+            
             // Override nodeId from incoming node if not defined on read node
             //if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
 

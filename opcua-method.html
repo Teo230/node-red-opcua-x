@@ -5,7 +5,9 @@
         defaults: {
             nodeid: { required: true },
             name: { value: "" },
-            client: { value: "", required: true, type: "opcua-client" }
+            client: { value: "", required: true, type: "opcua-client" },
+            inputargs: { value: [], required: false },
+            outputargs: { value: [], required: false },
         },
         inputs: 1,
         outputs: 1,
@@ -28,6 +30,19 @@
     <div class="form-row">
         <label for="node-input-client"><i class="fa fa-plug"></i> Client</label>
         <input type="text" id="node-input-client" placeholder="">
+    </div>
+    <h4>Input Arguments</h4>
+    <div class="form-row">
+        <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
+            <ol id="node-input-property-container"></ol>
+        </div>    
+    </div>
+
+    <h4>Output Arguments</h4>
+    <div class="form-row">
+        <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
+            <ol id="node-input-property-container"></ol>
+        </div>
     </div>
 </script>
 
