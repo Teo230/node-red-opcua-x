@@ -14,6 +14,7 @@ const EventEmitter = require('events');
 core.eventEmitter = core.eventEmitter || new EventEmitter()
 
 core.createOpcUaClient = function (connectionId, name, authOption) {
+
     // caused the connect method to fail after one single unsuccessful retry
     const connectionStrategy = {
         initialDelay: 1000,
@@ -43,41 +44,30 @@ core.connect = async function (connectionId, host, userOption) {
 
     if (!existingClient) return;
 
-    existingClient.on("abort", () => updateClientConnectionStatus(connectionId, "disconnected"));
-    existingClient.on("close", () => updateClientConnectionStatus(connectionId, "disconnected"));
-    existingClient.on("connection_reestablished", () => updateClientConnectionStatus(connectionId, "connected"));
-    existingClient.on("connection_lost", () => updateClientConnectionStatus(connectionId, "disconnected"));
-    existingClient.on("start_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
-    existingClient.on("after_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
+    existingClient.on("connected", () => notifyClientState(existingClient));
+    existingClient.on("abort", () => notifyClientState(existingClient));
+    existingClient.on("close", () => notifyClientState(existingClient));
+    existingClient.on("connection_reestablished", () => notifyClientState(existingClient));
+    existingClient.on("connection_lost", () => notifyClientState(existingClient));
+    existingClient.on("start_reconnection", () => notifyClientState(existingClient));
 
     try {
         await existingClient.connect(host);
 
         const session = await existingClient.createSession(userOption);
-        core.eventEmitter.emit('session_created', connectionId);
-        // session.on("session_closed", (statusCode) => {
-        //     console.log(" Session has been closed with statusCode = ", statusCode.toString());
-        // })
-        // session.on("session_restored", () => {
-        //     console.log(" Session has been restored");
-        // });
-        // session.on("keepalive", (lastKnownServerState) => {
-        //     console.log("KeepAlive lastKnownServerState", core.opcua.ServerState[lastKnownServerState]);
-        // });
-        // session.on("keepalive_failure", () => {
-        //     console.log("KeepAlive failure");
-        // });
+
+        session.on("session_restored", () => updateSessionState(session, "restored"));
+        session.on("session_closed", () => updateSessionState(session, "closed"));
+        session.on("keepalive", () => updateSessionState(session, "keepalive"));
+        session.on("keepalive_failure", () => updateSessionState(session, "keepalive_failed"));
+
         existingClient['session'] = session;
         core.createSubscription(connectionId, session);
     }
     catch (err) {
         console.error(err.message);
-        updateClientConnectionStatus(connectionId, "disconnected");
         return;
     }
-
-    // if all went well, set status connected!
-    updateClientConnectionStatus(connectionId, "connected");
 }
 
 core.close = async function (connectionId) {
@@ -88,12 +78,12 @@ core.close = async function (connectionId) {
         await closeSession(existingClient);
 
         // detach all events before destroy client
-        existingClient.removeListener("abort", () => updateClientConnectionStatus(connectionId, "disconnected"));
-        existingClient.removeListener("close", () => updateClientConnectionStatus(connectionId, "disconnected"));
-        existingClient.removeListener("connection_reestablished", () => updateClientConnectionStatus(connectionId, "connected"));
-        existingClient.removeListener("connection_lost", () => updateClientConnectionStatus(connectionId, "disconnected"));
-        existingClient.removeListener("start_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
-        existingClient.removeListener("after_reconnection", () => updateClientConnectionStatus(connectionId, "reconnecting"));
+        existingClient.removeListener("connected", () => notifyClientState(existingClient));
+        existingClient.removeListener("abort", () => notifyClientState(existingClient));
+        existingClient.removeListener("close", () => notifyClientState(existingClient));
+        existingClient.removeListener("connection_reestablished", () => notifyClientState(existingClient));
+        existingClient.removeListener("connection_lost", () => notifyClientState(existingClient));
+        existingClient.removeListener("start_reconnection", () => notifyClientState(existingClient));
 
         if (!existingClient.isReconnecting) {
             existingClient.disconnect();
@@ -111,6 +101,11 @@ async function closeSession(client) {
     let session = client.session;
     if (!session) return;
 
+    session.removeListener("session_restored", () => updateSessionState(session, "restored"));
+    session.removeListener("session_closed", () => updateSessionState(session, "closed"));
+    session.removeListener("keepalive", () => updateSessionState(session, "keepalive"));
+    session.removeListener("keepalive_failure", () => updateSessionState(session, "keepalive_failed"));
+
     await core.closeSubscription(session);
 
     await session.close();
@@ -118,9 +113,9 @@ async function closeSession(client) {
     client.session = null;
 }
 
-core.closeSubscription = async function(session){
+core.closeSubscription = async function (session) {
     let subscription = session.subscription;
-    if(!subscription) return;
+    if (!subscription) return;
 
     await subscription.terminate();
     subscription = null;
@@ -146,23 +141,29 @@ core.createSubscription = function (connectionId, session) {
     return subscription;
 }
 
-function updateClientConnectionStatus(connectionId, status) {
-    const existingClient = core.opcClients[connectionId];
-    if (!existingClient) return;
+function notifyClientState(client) {
+    console.debug(client.applicationName + ": " + client._internalState);
+    core.eventEmitter.emit('client_state', client);
+}
 
-    switch (status) {
-        case "connected":
-            console.debug(existingClient.applicationName + ":client has reconnected");
-            break;
-        case "reconnecting":
-            console.debug(existingClient.applicationName + ":client is trying to reconnect");
+function updateSessionState(session, state) {
+
+    switch (state) {
+        case "restored":
+            console.debug(session.sessionId + ": session restored");
             break
-        case "disconnected":
-            console.debug(existingClient.applicationName + ":client has lost connection");
+        case "closed":
+            console.debug(session.sessionId + ": session closed");
+            break;
+        case "keepalive":
+            console.debug(session.sessionId + ": session keepalive");
+            break;
+        case "keepalive_failed":
+            console.debug(session.sessionId + ": session keepalive failed");
             break;
     }
-    core.eventEmitter.emit('client_connection_state', connectionId, status);
-    existingClient['clientState'] = status;
+
+    core.eventEmitter.emit('session_state', session, state);
 }
 
 module.exports = core

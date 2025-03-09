@@ -41,6 +41,19 @@ or run command for global installation.
 
 # Getting started - Developing
 
+## Requirements
+- Node-RED version: v4.0.9
+- Node.js  version: v20.18.0
+
+## OPC Server simulation
+For testing I use the following OPC UA Server simulator
+
+[OPC Server Simulator - Integration Objects](https://integrationobjects.com/sioth-opc/sioth-opc-servers/opc-server-simulators/)
+
+## Setup
+
+### Import Library
+
 1. From the cloned folder run `npm i`
 2. Open a new terminal inside the node-red source folder
 3. Execute the following command `npm i <local folder node-red-opcua-x installation>`

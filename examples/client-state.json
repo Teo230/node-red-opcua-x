@@ -1,0 +1,40 @@
+[
+    {
+        "id": "149a4a37e7373ffa",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "0cdca3a354c13ccd",
+        "type": "debug",
+        "z": "149a4a37e7373ffa",
+        "name": "OPC Status",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 330,
+        "y": 60,
+        "wires": []
+    },
+    {
+        "id": "f4cddb1b8bec70d9",
+        "type": "opcua-client-state",
+        "z": "149a4a37e7373ffa",
+        "client": "",
+        "x": 130,
+        "y": 60,
+        "wires": [
+            [
+                "0cdca3a354c13ccd"
+            ]
+        ]
+    }
+]

@@ -18,7 +18,7 @@
         "version": ">=2.0.0",
         "nodes": {
             "opcua-client": "opcua-client.js",
-            "opcua-status": "opcua-status.js",
+            "opcua-client-state": "opcua-client-state.js",
             "opcua-read": "opcua-read.js",
             "opcua-browse": "opcua-browse.js",
             "opcua-subscription": "opcua-subscription.js",
@@ -42,6 +42,6 @@
     },
     "dependencies": {
         "events": "^3.3.0",
-        "node-opcua": "^2.127.1"
+        "node-opcua": "^2.149.0"
     }
 }

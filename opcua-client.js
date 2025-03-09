@@ -20,7 +20,7 @@ module.exports = function (RED) {
         }
 
         node.debug('Setup opc client for ' + node.name);
-        const opcClient = core.createOpcUaClient(node.connectionId, node.name, authOption);
+        core.createOpcUaClient(node.connectionId, node.name, authOption);
 
         // Connect client
         connect();
