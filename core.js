@@ -105,13 +105,8 @@ function CreateSubscription(connectionId, session) {
 }
 
 function IsValidNodeId(nodeId) {
-    try {
-        _ = NodeId.resolveNodeId(nodeId);
-        return true;
-    }
-    catch {
-        return false;
-    }
+    const regex = /^(ns=\d+;)?(i=\d+|s=[\w\-]+|g=[\da-fA-F\-]+|b=[\da-fA-F]*)$/i;
+    return regex.test(nodeId);
 }
 
 function GetClient(connectionId){
