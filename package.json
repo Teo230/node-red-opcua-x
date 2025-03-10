@@ -1,10 +1,10 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.7.1",
+    "version": "0.8.0",
     "license": "MIT",
     "author": {
         "name": "Teo230",
-        "email": "m.f.tim@live.it"
+        "email": "mfantin230@gmail.com"
     },
     "homepage": "https://github.com/Teo230/node-red-opcua-x",
     "repository": {

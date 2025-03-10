@@ -1,12 +1,13 @@
 module.exports = function (RED) {
-    var core = require('./core');
-    var opcua = require('node-opcua');
+    const {
+        GetClient
+    } = require('./core');
 
     function opcUaMethodNode(args) {
 
         RED.nodes.createNode(this, args);
         const opcuaclientnode = RED.nodes.getNode(args.client);
-        const existingClient = core.opcClients[opcuaclientnode.connectionId];
+        const existingClient = GetClient(opcuaclientnode.connectionId);
 
         var node = this;
 

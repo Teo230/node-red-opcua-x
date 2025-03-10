@@ -1,0 +1,207 @@
+[
+    {
+        "id": "149a4a37e7373ffa",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "c273260469fe351a",
+        "type": "opcua-browse",
+        "z": "149a4a37e7373ffa",
+        "nodeId": "i=84",
+        "name": "",
+        "client": "b745ba9f6168495f",
+        "x": 340,
+        "y": 80,
+        "wires": [
+            [
+                "fc8c9eab3d0d3159"
+            ]
+        ]
+    },
+    {
+        "id": "00acbd4788551a3b",
+        "type": "inject",
+        "z": "149a4a37e7373ffa",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 80,
+        "wires": [
+            [
+                "c273260469fe351a"
+            ]
+        ]
+    },
+    {
+        "id": "fc8c9eab3d0d3159",
+        "type": "debug",
+        "z": "149a4a37e7373ffa",
+        "name": "debug 1",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "c6cce88fb70a5d5f",
+        "type": "opcua-browse",
+        "z": "149a4a37e7373ffa",
+        "nodeId": "fehuwfbe",
+        "name": "",
+        "client": "b745ba9f6168495f",
+        "x": 340,
+        "y": 160,
+        "wires": [
+            [
+                "dfc74ada33f817c8"
+            ]
+        ]
+    },
+    {
+        "id": "01d0c7a827b7f22f",
+        "type": "inject",
+        "z": "149a4a37e7373ffa",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 160,
+        "wires": [
+            [
+                "c6cce88fb70a5d5f"
+            ]
+        ]
+    },
+    {
+        "id": "dfc74ada33f817c8",
+        "type": "debug",
+        "z": "149a4a37e7373ffa",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 160,
+        "wires": []
+    },
+    {
+        "id": "5501bd27649943ea",
+        "type": "comment",
+        "z": "149a4a37e7373ffa",
+        "name": "Read root folder",
+        "info": "",
+        "x": 120,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "48ea79e618f3fabd",
+        "type": "comment",
+        "z": "149a4a37e7373ffa",
+        "name": "Invalid NodeId",
+        "info": "",
+        "x": 110,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "63b31d0f04b6f44c",
+        "type": "opcua-browse",
+        "z": "149a4a37e7373ffa",
+        "nodeId": "",
+        "name": "",
+        "client": "b745ba9f6168495f",
+        "x": 340,
+        "y": 240,
+        "wires": [
+            [
+                "063960e6bbbe7eac"
+            ]
+        ]
+    },
+    {
+        "id": "10e7dd91d1f5584d",
+        "type": "inject",
+        "z": "149a4a37e7373ffa",
+        "name": "",
+        "props": [
+            {
+                "p": "nodeId",
+                "v": "ns=2;s=Tag1",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 240,
+        "wires": [
+            [
+                "63b31d0f04b6f44c"
+            ]
+        ]
+    },
+    {
+        "id": "063960e6bbbe7eac",
+        "type": "debug",
+        "z": "149a4a37e7373ffa",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 240,
+        "wires": []
+    },
+    {
+        "id": "7c6748ae275a1314",
+        "type": "comment",
+        "z": "149a4a37e7373ffa",
+        "name": "Valid NodeId from input",
+        "info": "",
+        "x": 140,
+        "y": 200,
+        "wires": []
+    },
+    {
+        "id": "b745ba9f6168495f",
+        "type": "opcua-client",
+        "name": "SIM",
+        "host": "opc.tcp://teo230-desktop:62640/SIM",
+        "securitypolicy": "None",
+        "messagesecurity": "None",
+        "anonymous": true,
+        "username": "",
+        "password": ""
+    }
+]

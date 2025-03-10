@@ -1,7 +1,15 @@
 module.exports = function (RED) {
 
-    var core = require('./core');
-    var opcua = require('node-opcua');
+    const {
+        CreateOpcUaClient,
+        Connect,
+        Close,
+    } = require('./core');
+    const {
+        SecurityPolicy,
+        MessageSecurityMode,
+        UserTokenType
+    } = require('node-opcua');
 
     // constructor
     function opcUaClientNode(args) {
@@ -15,12 +23,12 @@ module.exports = function (RED) {
 
         // Setup client
         const authOption = {
-            securityPolicy: opcua.SecurityPolicy[args.securitypolicy],
-            securityMode: opcua.MessageSecurityMode[args.messagesecurity],
+            securityPolicy: SecurityPolicy[args.securitypolicy],
+            securityMode: MessageSecurityMode[args.messagesecurity],
         }
 
         node.debug('Setup opc client for ' + node.name);
-        core.createOpcUaClient(node.connectionId, node.name, authOption);
+        CreateOpcUaClient(node.connectionId, node.name, authOption);
 
         // Connect client
         connect();
@@ -32,20 +40,20 @@ module.exports = function (RED) {
 
         async function connect() {
             const userOption = {
-                type: args.anonymous ? opcua.UserTokenType.Anonymous : opcua.UserTokenType.UserName,
+                type: args.anonymous ? UserTokenType.Anonymous : UserTokenType.UserName,
                 userName:  args.username,
                 password: args.password
             }
-            await core.connect(node.connectionId, node.host, userOption);
+            await Connect(node.connectionId, node.host, userOption);
         }
 
         async function onNodeClosed(done){
-            await core.close(node.connectionId);
+            await Close(node.connectionId);
             done();
         }
 
         function onNodeError(){
-            core.close(node.connectionId);
+            Close(node.connectionId);
         }
 
         //#endregion

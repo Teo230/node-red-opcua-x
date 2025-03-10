@@ -3,7 +3,7 @@
         category: 'opcuax',
         color: '#a6bbcf',
         defaults: {
-            nodeid: { value: "i=84", required: true },
+            nodeId: { value: "i=84" },
             name: { value: "" },
             client: { value: "", required: true, type: "opcua-client" }
         },
@@ -22,8 +22,8 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
-        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
+        <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
+        <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
     </div>
     <div class="form-row">
         <label for="node-input-client"><i class="fa fa-plug"></i> Client</label>

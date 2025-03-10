@@ -1,31 +1,25 @@
-'use strict'
-/**
- * Nested namespace settings.
- *
- * @type {}
- *
- * @Namespace core
- */
-var core = core || { opcClients: [] }
-core.opcua = core.opcua || require('node-opcua')
-core.opcClients = core.opcClients || {}
+const { EventEmitter } = require('events')
+const {
+    OPCUAClient,
+    ClientSubscription,
+    NodeId
+} = require('node-opcua')
 
-const EventEmitter = require('events');
-core.eventEmitter = core.eventEmitter || new EventEmitter()
+const opcClients = [];
+const eventEmitter = new EventEmitter();
 
-core.createOpcUaClient = function (connectionId, name, authOption) {
+function CreateOpcUaClient(connectionId, name, authOption) {
 
-    // caused the connect method to fail after one single unsuccessful retry
     const connectionStrategy = {
         initialDelay: 1000,
         maxDelay: 10000,
         maxRetry: 100
     };
 
-    const existingClient = core.opcClients[connectionId];
-    if (existingClient) return existingClient;
+    const client = opcClients[connectionId];
+    if (client) return client;
 
-    const newClient = core.opcua.OPCUAClient.create({
+    const newClient = OPCUAClient.create({
         applicationName: name,
         keepSessionAlive: true,
         keepAliveInterval: 1000,
@@ -34,35 +28,27 @@ core.createOpcUaClient = function (connectionId, name, authOption) {
         securityPolicy: authOption.securityPolicy,
         endpointMustExist: false
     });
-    core.opcClients[connectionId] = newClient;
+    opcClients[connectionId] = newClient;
 
     return newClient;
 }
 
-core.connect = async function (connectionId, host, userOption) {
-    const existingClient = core.opcClients[connectionId];
+async function Connect(connectionId, host, userOption) {
+    const client = opcClients[connectionId];
 
-    if (!existingClient) return;
+    if (!client) return;
 
-    existingClient.on("connected", () => notifyClientState(existingClient));
-    existingClient.on("abort", () => notifyClientState(existingClient));
-    existingClient.on("close", () => notifyClientState(existingClient));
-    existingClient.on("connection_reestablished", () => notifyClientState(existingClient));
-    existingClient.on("connection_lost", () => notifyClientState(existingClient));
-    existingClient.on("start_reconnection", () => notifyClientState(existingClient));
+    _attachClientListeners(client);
 
     try {
-        await existingClient.connect(host);
+        await client.connect(host);
 
-        const session = await existingClient.createSession(userOption);
+        const session = await client.createSession(userOption);
 
-        session.on("session_restored", () => updateSessionState(session, "restored"));
-        session.on("session_closed", () => updateSessionState(session, "closed"));
-        session.on("keepalive", () => updateSessionState(session, "keepalive"));
-        session.on("keepalive_failure", () => updateSessionState(session, "keepalive_failed"));
+        _attachSessionListeners(session);
 
-        existingClient['session'] = session;
-        core.createSubscription(connectionId, session);
+        client['session'] = session;
+        CreateSubscription(connectionId, session);
     }
     catch (err) {
         console.error(err.message);
@@ -70,59 +56,36 @@ core.connect = async function (connectionId, host, userOption) {
     }
 }
 
-core.close = async function (connectionId) {
-    let existingClient = core.opcClients[connectionId];
-    if (!existingClient) return;
+async function Close(connectionId) {
+    const client = opcClients[connectionId];
+    if (!client) return;
 
     try {
-        await closeSession(existingClient);
+        await _closeSession(client);
 
-        // detach all events before destroy client
-        existingClient.removeListener("connected", () => notifyClientState(existingClient));
-        existingClient.removeListener("abort", () => notifyClientState(existingClient));
-        existingClient.removeListener("close", () => notifyClientState(existingClient));
-        existingClient.removeListener("connection_reestablished", () => notifyClientState(existingClient));
-        existingClient.removeListener("connection_lost", () => notifyClientState(existingClient));
-        existingClient.removeListener("start_reconnection", () => notifyClientState(existingClient));
+        _removeClientListeners(client);
 
-        if (!existingClient.isReconnecting) {
-            existingClient.disconnect();
+        if (!client.isReconnecting) {
+            client.disconnect();
         }
 
-        existingClient = null;
-        core.opcClients[connectionId] = null;
+        client = null;
+        opcClients[connectionId] = null;
 
     } catch (err) {
         console.error(err.message);
     }
 }
 
-async function closeSession(client) {
-    let session = client.session;
-    if (!session) return;
-
-    session.removeListener("session_restored", () => updateSessionState(session, "restored"));
-    session.removeListener("session_closed", () => updateSessionState(session, "closed"));
-    session.removeListener("keepalive", () => updateSessionState(session, "keepalive"));
-    session.removeListener("keepalive_failure", () => updateSessionState(session, "keepalive_failed"));
-
-    await core.closeSubscription(session);
-
-    await session.close();
-    session = null;
-    client.session = null;
-}
-
-core.closeSubscription = async function (session) {
-    let subscription = session.subscription;
+async function CloseSubscription(session) {
+    const subscription = session.subscription;
     if (!subscription) return;
 
     await subscription.terminate();
     subscription = null;
-    session.subscription = null;
 }
 
-core.createSubscription = function (connectionId, session) {
+function CreateSubscription(connectionId, session) {
     if (session.subscription) return session.subscription;
 
     const subscriptionOptions = {
@@ -134,19 +97,79 @@ core.createSubscription = function (connectionId, session) {
         priority: 10
     };
 
-    const subscription = core.opcua.ClientSubscription.create(session, subscriptionOptions);
+    const subscription = ClientSubscription.create(session, subscriptionOptions);
     session['subscription'] = subscription;
-    core.eventEmitter.emit('subscription_created', connectionId);
+    eventEmitter.emit('subscription_created', connectionId);
 
     return subscription;
 }
 
-function notifyClientState(client) {
-    console.debug(client.applicationName + ": " + client._internalState);
-    core.eventEmitter.emit('client_state', client);
+function IsValidNodeId(nodeId) {
+    try {
+        _ = NodeId.resolveNodeId(nodeId);
+        return true;
+    }
+    catch {
+        return false;
+    }
 }
 
-function updateSessionState(session, state) {
+function GetClient(connectionId){
+    return opcClients[connectionId];
+}
+
+//#region private
+
+async function _closeSession(client) {
+    const session = client.session;
+    if (!session) return;
+
+    _removeSessionListeners(session);
+
+    await CloseSubscription(session);
+
+    await session.close();
+    session = null;
+}
+
+function _attachClientListeners(client) {
+    client.on("connected", () => _notifyClientState(client));
+    client.on("abort", () => _notifyClientState(client));
+    client.on("close", () => _notifyClientState(client));
+    client.on("connection_reestablished", () => _notifyClientState(client));
+    client.on("connection_lost", () => _notifyClientState(client));
+    client.on("start_reconnection", () => _notifyClientState(client));
+}
+
+function _removeClientListeners(client) {
+    client.removeListener("connected", () => _notifyClientState(client));
+    client.removeListener("abort", () => _notifyClientState(client));
+    client.removeListener("close", () => _notifyClientState(client));
+    client.removeListener("connection_reestablished", () => _notifyClientState(client));
+    client.removeListener("connection_lost", () => _notifyClientState(client));
+    client.removeListener("start_reconnection", () => _notifyClientState(client));
+}
+
+function _attachSessionListeners(session) {
+    session.on("session_restored", () => _updateSessionState(session, "restored"));
+    session.on("session_closed", () => _updateSessionState(session, "closed"));
+    session.on("keepalive", () => _updateSessionState(session, "keepalive"));
+    session.on("keepalive_failure", () => _updateSessionState(session, "keepalive_failed"));
+}
+
+function _removeSessionListeners(session) {
+    session.removeListener("session_restored", () => _updateSessionState(session, "restored"));
+    session.removeListener("session_closed", () => _updateSessionState(session, "closed"));
+    session.removeListener("keepalive", () => _updateSessionState(session, "keepalive"));
+    session.removeListener("keepalive_failure", () => _updateSessionState(session, "keepalive_failed"));
+}
+
+function _notifyClientState(client) {
+    console.debug(client.applicationName + ": " + client._internalState);
+    eventEmitter.emit('client_state', client);
+}
+
+function _updateSessionState(session, state) {
 
     switch (state) {
         case "restored":
@@ -163,7 +186,22 @@ function updateSessionState(session, state) {
             break;
     }
 
-    core.eventEmitter.emit('session_state', session, state);
+    eventEmitter.emit('session_state', session, state);
 }
 
-module.exports = core
+//#endregion
+
+//#region export
+
+module.exports = {
+    CreateOpcUaClient,
+    Connect,
+    Close,
+    CloseSubscription,
+    CreateSubscription,
+    GetClient,
+    IsValidNodeId,
+    eventEmitter
+}
+
+//#endregion

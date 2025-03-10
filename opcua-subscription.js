@@ -1,8 +1,15 @@
 // See example https://github.com/node-opcua/node-opcua/blob/af235f19e9e353fa748c11009b1300f76026fb28/packages/playground/client_with_simple_subscription.js#L83
 module.exports = function (RED) {
 
-    var core = require('./core');
-    var opcua = require('node-opcua');
+    const {
+        GetClient,
+        eventEmitter
+    } = require('./core');
+    const {
+        ClientMonitoredItem,
+        AttributeIds,
+        TimestampsToReturn
+    } = require('node-opcua');
 
     function opcUaSubscriptionNode(args) {
 
@@ -14,19 +21,19 @@ module.exports = function (RED) {
         node.samplinginterval = args.samplinginterval;
         node.on('close', onNodeClosed);
 
-        let monitoredItem = new opcua.ClientMonitoredItem();
+        let monitoredItem = new ClientMonitoredItem();
 
-        core.eventEmitter.on('subscription_created', onSubscriptionCreated);
+        eventEmitter.on('subscription_created', onSubscriptionCreated);
 
         function onSubscriptionCreated(connectionId) {
-            const existingClient = core.opcClients[connectionId];
+            const existingClient = GetClient(connectionId);
             let subscription = existingClient.session.subscription;
             if (monitoredItem?.monitoredItemId) return;
             monitorItem(subscription);
         }
 
         async function onNodeClosed(done) {
-            core.eventEmitter.removeListener('subscription_created', onSubscriptionCreated);
+            eventEmitter.removeListener('subscription_created', onSubscriptionCreated);
 
             if (monitoredItem?.monitoredItemId) {
                 monitoredItem.removeListener("changed", onMonitoredItemDataChanged);
@@ -40,7 +47,7 @@ module.exports = function (RED) {
         function monitorItem(subscription) {
             const itemToMonitor = {
                 nodeId: node.nodeId,
-                attributeId: opcua.AttributeIds.Value
+                attributeId: AttributeIds.Value
             };
 
             const parameters = {
@@ -49,11 +56,11 @@ module.exports = function (RED) {
                 queueSize: 10
             };
 
-            monitoredItem = opcua.ClientMonitoredItem.create(
+            monitoredItem = ClientMonitoredItem.create(
                 subscription,
                 itemToMonitor,
                 parameters,
-                opcua.TimestampsToReturn.Both
+                TimestampsToReturn.Both
             );
 
             monitoredItem.on("changed", onMonitoredItemDataChanged);

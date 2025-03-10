@@ -1,13 +1,17 @@
 module.exports = function (RED) {
 
-    var core = require('./core');
-    var opcua = require('node-opcua');
+    const {
+        GetClient
+    } = require('./core');
+    const {
+        AttributeIds
+    } = require('node-opcua');
 
     function opcUaReadNode(args) {
 
         RED.nodes.createNode(this, args);
         const opcuaclientnode = RED.nodes.getNode(args.client);
-        const existingClient = core.opcClients[opcuaclientnode.connectionId];
+        const existingClient = GetClient(opcuaclientnode.connectionId);
 
         var node = this;
 
@@ -33,7 +37,7 @@ module.exports = function (RED) {
         async function readNode() {
             const nodeToRead = {
                 nodeId: node.nodeId,
-                attributeId: opcua.AttributeIds.Value
+                attributeId: AttributeIds.Value
             };
             const dataValue = await existingClient.session.read(nodeToRead);
             const dataValueString = JSON.stringify(dataValue);

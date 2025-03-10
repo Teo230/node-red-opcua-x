@@ -1,6 +1,8 @@
 module.exports = function (RED) {
 
-    var core = require('./core');
+    const {
+        GetClient
+    } = require('./core');
 
     function opcUaStatusNode(args) {
 
@@ -10,12 +12,14 @@ module.exports = function (RED) {
         let node = this;
         let state = false;
 
-        if(opcuaclientnode == null) return;
-
+        if (!opcuaclientnode) {
+            node.error("OPC UA Client not defined");
+            return;
+        }
         setInterval(checkServerConnection, 1000);
 
         function checkServerConnection() {
-            const existingClient = core.opcClients[opcuaclientnode.connectionId];
+            const existingClient = GetClient(opcuaclientnode.connectionId);
             if (existingClient) {
                 if (state === existingClient._internalState) return;
                 state = existingClient._internalState;
@@ -26,7 +30,6 @@ module.exports = function (RED) {
                         break;
                     default:
                         node.status({ fill: "yellow", shape: "ring", text: state });
-
                 }
             } else {
                 state = "disconnected";

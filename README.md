@@ -1,5 +1,6 @@
 # node-red-opcua-x
-<img src="images/node-red-logo.png" alt="drawing" style="height:200px;"/> <img src="icons/opcua-logo.png" alt="drawing" style="height:200px;"/> 
+<img src="images/node-red-logo.png" alt="drawing" style="height:200px;"/> 
+<!-- <img src="icons/opcua-logo.png" alt="drawing" style="height:200px;"/>  -->
 
 ## What is
 A package that handles OPC UA Client request like read, browse, write, ...
