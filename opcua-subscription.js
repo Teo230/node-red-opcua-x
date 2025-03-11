@@ -3,6 +3,7 @@ module.exports = function (RED) {
 
     const {
         GetClient,
+        IsValidNodeId,
         eventEmitter
     } = require('./core');
     const {
@@ -19,8 +20,14 @@ module.exports = function (RED) {
         let node = this;
         node.nodeId = args.nodeid;
         node.samplinginterval = args.samplinginterval;
-        node.on('close', onNodeClosed);
 
+        const isValid = IsValidNodeId(node.nodeId);
+        if(!isValid){
+            node.error(node.nodeId + " is not a valid NodeId");
+            return;
+        }
+
+        node.on('close', onNodeClosed);
         let monitoredItem = new ClientMonitoredItem();
 
         eventEmitter.on('subscription_created', onSubscriptionCreated);

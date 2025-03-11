@@ -32,7 +32,13 @@ module.exports = function (RED) {
             }
             
             // Override nodeId from incoming node if not defined on read node
-            //if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
+            if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
+            
+            const isValid = IsValidNodeId(node.nodeId);
+            if(!isValid){
+                node.error(node.nodeId + " is not a valid NodeId");
+                return;
+            }
 
             const value = msg.payload.value;
 
