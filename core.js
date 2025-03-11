@@ -6,10 +6,12 @@ const {
     NodeId,
     Variant,
     StatusCodes,
-    DataType
+    DataType,
+    UAObject
 } = require('node-opcua')
 
 const opcClients = [];
+/** @type {OPCUAServer} */
 let opcServer = {};
 const eventEmitter = new EventEmitter();
 
@@ -114,11 +116,11 @@ function IsValidNodeId(nodeId) {
     return regex.test(nodeId);
 }
 
-function GetClient(connectionId){
+function GetClient(connectionId) {
     return opcClients[connectionId];
 }
 
-function CreateOpcUaServer(){
+function CreateOpcUaServer() {
     opcServer = new OPCUAServer({
         port: 4334,
         resourcePath: "/UA/node-red-x",
@@ -132,7 +134,7 @@ function CreateOpcUaServer(){
     _initializeServer();
 }
 
-function CloseServer(){
+function CloseServer() {
     opcServer.shutdown(1000, () => {
         console.log("OPC UA Server shutdown completed");
     });
@@ -209,7 +211,7 @@ function _updateSessionState(session, state) {
     eventEmitter.emit('session_state', session, state);
 }
 
-function _initializeServer(){
+function _initializeServer() {
     opcServer.initialize(() => {
         console.log("OPC UA Server initialized");
 
@@ -217,38 +219,140 @@ function _initializeServer(){
         const namespace = addressSpace.getOwnNamespace();
 
         // declare a new object
-        const device = namespace.addObject({
+        const simNode = namespace.addObject({
             organizedBy: addressSpace.rootFolder.objects,
-            browseName: "MyDevice"
+            browseName: "SIM"
         });
 
-        // add a variable named MyVariable1 to the newly created object
-        let variable1 = 1;
-
-        namespace.addVariable({
-            componentOf: device,
-            browseName: "MyVariable1",
-            dataType: "Double",
-            value: {
-                get: () => {
-                    return new Variant({dataType: DataType.Double, value: variable1 });
-                },
-                set: (variant) => {
-                    variable1 = parseFloat(variant.value);
-                    return StatusCodes.Good;
-                }
-            }
+        const scalarFolder = namespace.addObject({
+            organizedBy: simNode,
+            browseName: "Scalar",
+            typeDefinition: "FolderType"
         });
+
+        //Scalar values
+        _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
+        _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
+        _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
+        _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
+        _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
+        _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
+        _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
+        _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
 
         _startServer();
     });
 }
 
-function _startServer(){
+
+/**
+ * Adds a variable to the OPC UA namespace.
+ *
+ * @param {Object} namespace - The namespace object to which the variable will be added.
+ * @param {import('node-opcua').UAObject} parentNode - The parent node under which the variable will be added.
+ * @param {string} browseName - The browse name of the variable.
+ * @param {DataType} dataType - The data type of the variable.
+ */
+function _addVariable(namespace, parentNode, browseName, dataType) {
+    namespace.addVariable({
+        componentOf: parentNode,
+        browseName: browseName,
+        dataType: dataType,
+        value: {
+            get: () => {
+                return new Variant({
+                    dataType: dataType,
+                    //arrayType: VariantArrayType.Scalar,
+                    value: _getDefaultValue(dataType)
+                });
+            },
+            set: () => {
+                return StatusCodes.Good;
+            }
+        }
+    });
+}
+
+/**
+ * 
+ * @param {DataType} dataType - The data type of the variable.
+ */
+function _getDefaultValue(dataType) {
+
+    let defaultValue;
+    switch (dataType) {
+
+        case DataType.Double:
+        case DataType.Float:
+            defaultValue = 0.0;
+            break;
+
+        case DataType.Int16:
+        case DataType.Int32:
+        case DataType.UInt16:
+        case DataType.UInt32:
+        case DataType.Byte:
+        case DataType.SByte:
+            defaultValue = 0;
+            break;
+
+        case DataType.Int64:
+        case DataType.UInt64:
+            defaultValue = 0n;
+            break;
+
+        case DataType.String:
+            defaultValue = "";
+            break;
+
+        case DataType.Boolean:
+            defaultValue = false;
+            break;
+
+        case DataType.DateTime:
+            defaultValue = new Date(0);
+            break;
+
+        case DataType.Guid:
+            defaultValue = "00000000-0000-0000-0000-000000000000";
+            break;
+
+        case DataType.ByteString:
+            defaultValue = Buffer.alloc(0);
+            break;
+
+        case DataType.XmlElement:
+            defaultValue = "<xml></xml>";
+            break;
+
+        case DataType.LocalizedText:
+            defaultValue = { text: "", locale: "" };
+            break;
+
+        case DataType.QualifiedName:
+            defaultValue = { name: "", namespaceIndex: 0 };
+            break;
+
+        case DataType.NodeId:
+            defaultValue = new NodeId();
+            break;
+
+        default:
+            defaultValue = null;
+            break;
+    }
+    return defaultValue;
+}
+
+function _startServer() {
     opcServer.start(() => {
         console.log("port ", opcServer.endpoints[0].port);
         const endpointUrl = opcServer.endpoints[0].endpointDescriptions()[0].endpointUrl;
-        console.log(" the primary server endpoint url is ", endpointUrl );
+        console.log(" the primary server endpoint url is ", endpointUrl);
     });
 }
 
