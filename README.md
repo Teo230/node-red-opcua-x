@@ -27,6 +27,8 @@ The first stable version will start from `1.0.0`
 - [ ] Events
 - [ ] Methods
 - [x] Connection security access
+- [x] Simple Server (sample server for testing)
+- [ ] Advanced Server
 
 # Getting started
 From node-red search for `node-red-opcua-x`

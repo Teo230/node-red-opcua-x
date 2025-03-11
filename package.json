@@ -1,6 +1,6 @@
 {
     "name": "node-red-opcua-x",
-    "version": "0.8.2",
+    "version": "0.9.0",
     "license": "MIT",
     "author": {
         "name": "Teo230",
@@ -23,7 +23,8 @@
             "opcua-browse": "opcua-browse.js",
             "opcua-subscription": "opcua-subscription.js",
             "opcua-write": "opcua-write.js",
-            "opcua-method": "opcua-method.js"
+            "opcua-method": "opcua-method.js",
+            "opcua-server": "opcua-server.js"
         }
     },
     "keywords": [

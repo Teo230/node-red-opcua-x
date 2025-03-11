@@ -2,10 +2,15 @@ const { EventEmitter } = require('events')
 const {
     OPCUAClient,
     ClientSubscription,
-    NodeId
+    OPCUAServer,
+    NodeId,
+    Variant,
+    StatusCodes,
+    DataType
 } = require('node-opcua')
 
 const opcClients = [];
+let opcServer = {};
 const eventEmitter = new EventEmitter();
 
 function CreateOpcUaClient(connectionId, name, authOption) {
@@ -113,6 +118,26 @@ function GetClient(connectionId){
     return opcClients[connectionId];
 }
 
+function CreateOpcUaServer(){
+    opcServer = new OPCUAServer({
+        port: 4334,
+        resourcePath: "/UA/node-red-x",
+        buildInfo: {
+            productName: "MySimulatedNodeRedXServer",
+            buildNumber: "7658",
+            buildDate: new Date(2025, 3, 11)
+        }
+    });
+
+    _initializeServer();
+}
+
+function CloseServer(){
+    opcServer.shutdown(1000, () => {
+        console.log("OPC UA Server shutdown completed");
+    });
+}
+
 //#region private
 
 async function _closeSession(client) {
@@ -184,6 +209,49 @@ function _updateSessionState(session, state) {
     eventEmitter.emit('session_state', session, state);
 }
 
+function _initializeServer(){
+    opcServer.initialize(() => {
+        console.log("OPC UA Server initialized");
+
+        const addressSpace = opcServer.engine.addressSpace;
+        const namespace = addressSpace.getOwnNamespace();
+
+        // declare a new object
+        const device = namespace.addObject({
+            organizedBy: addressSpace.rootFolder.objects,
+            browseName: "MyDevice"
+        });
+
+        // add a variable named MyVariable1 to the newly created object
+        let variable1 = 1;
+
+        namespace.addVariable({
+            componentOf: device,
+            browseName: "MyVariable1",
+            dataType: "Double",
+            value: {
+                get: () => {
+                    return new Variant({dataType: DataType.Double, value: variable1 });
+                },
+                set: (variant) => {
+                    variable1 = parseFloat(variant.value);
+                    return StatusCodes.Good;
+                }
+            }
+        });
+
+        _startServer();
+    });
+}
+
+function _startServer(){
+    opcServer.start(() => {
+        console.log("port ", opcServer.endpoints[0].port);
+        const endpointUrl = opcServer.endpoints[0].endpointDescriptions()[0].endpointUrl;
+        console.log(" the primary server endpoint url is ", endpointUrl );
+    });
+}
+
 //#endregion
 
 //#region export
@@ -196,6 +264,8 @@ module.exports = {
     CreateSubscription,
     GetClient,
     IsValidNodeId,
+    CreateOpcUaServer,
+    CloseServer,
     eventEmitter
 }
 
