@@ -12,7 +12,7 @@ const {
 
 const opcClients = [];
 /** @type {OPCUAServer} */
-let opcServer = {};
+let opcServer = null;
 const eventEmitter = new EventEmitter();
 
 function CreateOpcUaClient(connectionId, name, authOption) {
@@ -135,7 +135,6 @@ function CreateOpcUaServer() {
 async function InitializeServer() {
 
     await opcServer.initialize();
-    console.log("OPC UA Server initialized");
 
     const addressSpace = opcServer.engine.addressSpace;
     const namespace = addressSpace.getOwnNamespace();
@@ -179,6 +178,8 @@ async function InitializeServer() {
 async function CloseServer() {
     await opcServer.shutdown(1000);
 }
+
+function GetServer() { return opcServer; }
 
 //#region private
 
@@ -365,6 +366,7 @@ module.exports = {
     CreateOpcUaServer,
     CloseServer,
     InitializeServer,
+    GetServer,
     eventEmitter
 }
 
