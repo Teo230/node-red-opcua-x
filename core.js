@@ -357,7 +357,6 @@ function _getDefaultValue(dataType) {
 
 function _startServer() {
     opcServer.start(() => {
-        console.log("port ", opcServer.endpoints[0].port);
         const endpointUrl = opcServer.endpoints[0].endpointDescriptions()[0].endpointUrl;
         console.log(" the primary server endpoint url is ", endpointUrl);
     });
