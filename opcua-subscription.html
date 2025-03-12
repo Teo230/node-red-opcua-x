@@ -10,8 +10,9 @@
         inputs: 0,
         outputs: 1,
         icon: "opcua-logo.png",
+        paletteLabel:  "subscribe",
         label: function () {
-            return this.defaults.client.name;
+            return this.name || "subscribe";
         }
     });
 </script>

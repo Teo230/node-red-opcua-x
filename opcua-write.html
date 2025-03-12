@@ -9,8 +9,9 @@
         inputs: 1,
         outputs: 0,
         icon: "opcua-logo.png",
+        paletteLabel:  "write",
         label: function () {
-            return this.defaults.client.name;
+            return this.name || "write";
         }
     });
 </script>

@@ -1,6 +1,8 @@
 <script type="text/javascript">
     RED.nodes.registerType('opcua-client', {
-        category: 'config',
+        category: 'opcuax',
+        color: '#a6bbcf',
+        icon: "opcua-logo.png",
         defaults: {
             name: { required: true },
             host: { required: true },
@@ -10,8 +12,11 @@
             username: { required: false },
             password: { required: false }
         },
+        paletteLabel:  "opcuax-client",
+        inputs: 0,
+        outputs: 1,
         label: function () {
-            return this.name;
+            return this.name || "opcuax-client";
         },
         oneditprepare: function () {
             $("#node-config-input-securitypolicy").typedInput({

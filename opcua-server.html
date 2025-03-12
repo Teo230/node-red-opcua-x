@@ -4,15 +4,46 @@
         color: '#a6bbcf',
         defaults: {
         },
-        inputs: 0,
-        outputs: 1,
+        inputs: 1,
+        outputs: 0,
         icon: "opcua-logo.png",
+        paletteLabel:  "opcuax-server",
         label: function () {
-            return this.name || "opcua-server";
+            return this.name || "opcuax-server";
         }
     });
 </script>
 
+<script type="text/html" data-help-name="opcua-server"></script>
+    <p>This node allows you to configure an OPC UA server using the node-opcua library.</p>
+</script>
 <script type="text/html" data-template-name="opcua-server">
-    
+    <div class="form-row">
+        <label for="node-input-name"><i class="icon-tag"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-port"><i class="icon-tag"></i> Port</label>
+        <input type="text" id="node-input-port" placeholder="Port">
+    </div>
+    <div class="form-row">
+        <label for="node-input-endpoint"><i class="icon-tag"></i> Endpoint</label>
+        <input type="text" id="node-input-endpoint" placeholder="Endpoint">
+    </div>
+    <div class="form-row">
+        <label for="node-input-securityPolicy"><i class="icon-tag"></i> Security Policy</label>
+        <input type="text" id="node-input-securityPolicy" placeholder="Security Policy">
+    </div>
+    <div class="form-row">
+        <label for="node-input-securityMode"><i class="icon-tag"></i> Security Mode</label>
+        <input type="text" id="node-input-securityMode" placeholder="Security Mode">
+    </div>
+    <div class="form-row">
+        <label for="node-input-username"><i class="icon-tag"></i> Username</label>
+        <input type="text" id="node-input-username" placeholder="Username">
+    </div>
+    <div class="form-row">
+        <label for="node-input-password"><i class="icon-tag"></i> Password</label>
+        <input type="password" id="node-input-password" placeholder="Password">
+    </div>
 </script>

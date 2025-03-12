@@ -5,11 +5,12 @@
         defaults: {
             client: {value:"", required: true, type:"opcua-client"}
         },
-        inputs: 0,
+        inputs: 1,
         outputs: 1,
         icon: "opcua-logo.png",
+        paletteLabel:  "opcuax-client-state",
         label: function() {
-            return this.defaults.client.name;
+            return this.name || "opcuax-client-state";
         }
     });
 </script>
