@@ -6,11 +6,17 @@ const {
     NodeId,
     Variant,
     StatusCodes,
-    DataType
+    DataType,
+    UAObject
 } = require('node-opcua')
 
-const opcClients = [];
-let opcServer = {};
+/**@type {OPCUAClient[]} */
+let opcClients = [];
+
+/** @type {OPCUAServer} */
+let opcServer = null;
+
+/**@type {EventEmitter} */
 const eventEmitter = new EventEmitter();
 
 function CreateOpcUaClient(connectionId, name, authOption) {
@@ -62,7 +68,7 @@ async function Connect(connectionId, host, userOption) {
 }
 
 async function Close(connectionId) {
-    const client = opcClients[connectionId];
+    let client = opcClients[connectionId];
     if (!client) return;
 
     try {
@@ -83,7 +89,7 @@ async function Close(connectionId) {
 }
 
 async function CloseSubscription(session) {
-    const subscription = session.subscription;
+    let subscription = session.subscription;
     if (!subscription) return;
 
     await subscription.terminate();
@@ -114,11 +120,11 @@ function IsValidNodeId(nodeId) {
     return regex.test(nodeId);
 }
 
-function GetClient(connectionId){
+function GetClient(connectionId) {
     return opcClients[connectionId];
 }
 
-function CreateOpcUaServer(){
+function CreateOpcUaServer() {
     opcServer = new OPCUAServer({
         port: 4334,
         resourcePath: "/UA/node-red-x",
@@ -128,20 +134,61 @@ function CreateOpcUaServer(){
             buildDate: new Date(2025, 3, 11)
         }
     });
-
-    _initializeServer();
 }
 
-function CloseServer(){
-    opcServer.shutdown(1000, () => {
-        console.log("OPC UA Server shutdown completed");
+async function InitializeServer() {
+
+    await opcServer.initialize();
+
+    const addressSpace = opcServer.engine.addressSpace;
+    const namespace = addressSpace.getOwnNamespace();
+
+    // declare a new object
+    const simNode = namespace.addObject({
+        organizedBy: addressSpace.rootFolder.objects,
+        browseName: "SIM"
     });
+
+    const scalarFolder = namespace.addObject({
+        organizedBy: simNode,
+        browseName: "Scalar",
+        typeDefinition: "FolderType"
+    });
+
+    //Scalar values
+    _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
+    _addVariable(namespace, scalarFolder, DataType[DataType.SByte], DataType.SByte);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Byte], DataType.Byte);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt16], DataType.UInt16);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int32], DataType.Int32);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt32], DataType.UInt32);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int64], DataType.Int64);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt64], DataType.UInt64);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
+    _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
+    _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
+    _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
+    _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
+    _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
+    _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
+    _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
+
+    await opcServer.start();
 }
+
+async function CloseServer() {
+    await opcServer.shutdown(1000);
+}
+
+function GetServer() { return opcServer; }
 
 //#region private
 
 async function _closeSession(client) {
-    const session = client.session;
+    let session = client.session;
     if (!session) return;
 
     _removeSessionListeners(session);
@@ -185,71 +232,127 @@ function _removeSessionListeners(session) {
 }
 
 function _notifyClientState(client) {
-    console.debug(client.applicationName + ": " + client._internalState);
+    // console.debug(client.applicationName + ": " + client._internalState);
     eventEmitter.emit('client_state', client);
 }
 
 function _updateSessionState(session, state) {
 
-    switch (state) {
-        case "restored":
-            console.debug(session.sessionId + ": session restored");
-            break
-        case "closed":
-            console.debug(session.sessionId + ": session closed");
-            break;
-        case "keepalive":
-            console.debug(session.sessionId + ": session keepalive");
-            break;
-        case "keepalive_failed":
-            console.debug(session.sessionId + ": session keepalive failed");
-            break;
-    }
+    // switch (state) {
+    //     case "restored":
+    //         console.debug(session.sessionId + ": session restored");
+    //         break
+    //     case "closed":
+    //         console.debug(session.sessionId + ": session closed");
+    //         break;
+    //     case "keepalive":
+    //         console.debug(session.sessionId + ": session keepalive");
+    //         break;
+    //     case "keepalive_failed":
+    //         console.debug(session.sessionId + ": session keepalive failed");
+    //         break;
+    // }
 
     eventEmitter.emit('session_state', session, state);
 }
 
-function _initializeServer(){
-    opcServer.initialize(() => {
-        console.log("OPC UA Server initialized");
-
-        const addressSpace = opcServer.engine.addressSpace;
-        const namespace = addressSpace.getOwnNamespace();
-
-        // declare a new object
-        const device = namespace.addObject({
-            organizedBy: addressSpace.rootFolder.objects,
-            browseName: "MyDevice"
-        });
-
-        // add a variable named MyVariable1 to the newly created object
-        let variable1 = 1;
-
-        namespace.addVariable({
-            componentOf: device,
-            browseName: "MyVariable1",
-            dataType: "Double",
-            value: {
-                get: () => {
-                    return new Variant({dataType: DataType.Double, value: variable1 });
-                },
-                set: (variant) => {
-                    variable1 = parseFloat(variant.value);
-                    return StatusCodes.Good;
-                }
+/**
+ * Adds a variable to the OPC UA namespace.
+ *
+ * @param {Object} namespace - The namespace object to which the variable will be added.
+ * @param {import('node-opcua').UAObject} parentNode - The parent node under which the variable will be added.
+ * @param {string} browseName - The browse name of the variable.
+ * @param {DataType} dataType - The data type of the variable.
+ */
+function _addVariable(namespace, parentNode, browseName, dataType) {
+    namespace.addVariable({
+        componentOf: parentNode,
+        browseName: browseName,
+        dataType: dataType,
+        value: {
+            get: () => {
+                return new Variant({
+                    dataType: dataType,
+                    //arrayType: VariantArrayType.Scalar,
+                    value: _getDefaultValue(dataType)
+                });
+            },
+            set: () => {
+                return StatusCodes.Good;
             }
-        });
-
-        _startServer();
+        }
     });
 }
 
-function _startServer(){
-    opcServer.start(() => {
-        console.log("port ", opcServer.endpoints[0].port);
-        const endpointUrl = opcServer.endpoints[0].endpointDescriptions()[0].endpointUrl;
-        console.log(" the primary server endpoint url is ", endpointUrl );
-    });
+/**
+ * 
+ * @param {DataType} dataType - The data type of the variable.
+ */
+function _getDefaultValue(dataType) {
+
+    let defaultValue;
+    switch (dataType) {
+
+        case DataType.Double:
+        case DataType.Float:
+            defaultValue = 0.0;
+            break;
+
+        case DataType.Int16:
+        case DataType.Int32:
+        case DataType.UInt16:
+        case DataType.UInt32:
+        case DataType.Byte:
+        case DataType.SByte:
+            defaultValue = 0;
+            break;
+
+        case DataType.Int64:
+        case DataType.UInt64:
+            defaultValue = Number(0n);
+            break;
+
+        case DataType.String:
+            defaultValue = "";
+            break;
+
+        case DataType.Boolean:
+            defaultValue = false;
+            break;
+
+        case DataType.DateTime:
+            defaultValue = new Date();
+            break;
+
+        case DataType.Guid:
+            defaultValue = "8cae8c9a-a1d6-4e93-b680-d9a20c5a703c";
+            break;
+
+        case DataType.ByteString:
+            defaultValue = Buffer.alloc(0);
+            break;
+
+        case DataType.XmlElement:
+            defaultValue = "<xml></xml>";
+            break;
+
+        case DataType.LocalizedText:
+            defaultValue = { text: "", locale: "" };
+            break;
+
+        case DataType.QualifiedName:
+            defaultValue = { name: "", namespaceIndex: 0 };
+            break;
+
+        case DataType.NodeId:
+            defaultValue = new NodeId();
+            break;
+
+        default:
+            defaultValue = null;
+            break;
+    }
+    return defaultValue;
 }
 
 //#endregion
@@ -266,6 +369,8 @@ module.exports = {
     IsValidNodeId,
     CreateOpcUaServer,
     CloseServer,
+    InitializeServer,
+    GetServer,
     eventEmitter
 }
 

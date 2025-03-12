@@ -1,0 +1,694 @@
+[
+    {
+        "id": "00ca436790c52ebc",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "fed350e93f5e81bc",
+        "type": "opcua-server",
+        "z": "00ca436790c52ebc",
+        "x": 110,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c38fef0d0f2eff15",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1002",
+        "name": "Boolean",
+        "client": "392ec01ef4109c02",
+        "x": 320,
+        "y": 100,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "f04d11cb86b0e139",
+        "type": "debug",
+        "z": "00ca436790c52ebc",
+        "name": "Value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload.value.value",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 850,
+        "y": 640,
+        "wires": []
+    },
+    {
+        "id": "9c0350cfd3fe0f01",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 100,
+        "wires": [
+            [
+                "c38fef0d0f2eff15"
+            ]
+        ]
+    },
+    {
+        "id": "3dae0fb79f0279b0",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1004",
+        "name": "Byte",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 160,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "eea3a4277d38aeb8",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 160,
+        "wires": [
+            [
+                "3dae0fb79f0279b0"
+            ]
+        ]
+    },
+    {
+        "id": "0e67b9cb5a8aeb58",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1016",
+        "name": "ByteString",
+        "client": "392ec01ef4109c02",
+        "x": 330,
+        "y": 220,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "0757aa999607ed9a",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 220,
+        "wires": [
+            [
+                "0e67b9cb5a8aeb58"
+            ]
+        ]
+    },
+    {
+        "id": "3d0cd06c8e86ce52",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1014",
+        "name": "DateTime",
+        "client": "392ec01ef4109c02",
+        "x": 320,
+        "y": 280,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "b0e5972a4fb03572",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 280,
+        "wires": [
+            [
+                "3d0cd06c8e86ce52"
+            ]
+        ]
+    },
+    {
+        "id": "849578b542b4a457",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1012",
+        "name": "Double",
+        "client": "392ec01ef4109c02",
+        "x": 320,
+        "y": 340,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "2b0dd0c92465495f",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 340,
+        "wires": [
+            [
+                "849578b542b4a457"
+            ]
+        ]
+    },
+    {
+        "id": "8eea2a82a5b20a3f",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1011",
+        "name": "Float",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 400,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "0706a0af7b8ace33",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 400,
+        "wires": [
+            [
+                "8eea2a82a5b20a3f"
+            ]
+        ]
+    },
+    {
+        "id": "c6d55edbe9b396dd",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1015",
+        "name": "Guid",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 460,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "0f32468fb9d034b8",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 460,
+        "wires": [
+            [
+                "c6d55edbe9b396dd"
+            ]
+        ]
+    },
+    {
+        "id": "4dd2e7ef44e55eea",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1005",
+        "name": "Int16",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 520,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "231327f86090d918",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 520,
+        "wires": [
+            [
+                "4dd2e7ef44e55eea"
+            ]
+        ]
+    },
+    {
+        "id": "7c26550617737551",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1007",
+        "name": "Int32",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 580,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "d413a5dea122b765",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 580,
+        "wires": [
+            [
+                "7c26550617737551"
+            ]
+        ]
+    },
+    {
+        "id": "7910442c373cf4a6",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1009",
+        "name": "Int64",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 640,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "9d2e049edb2765de",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 640,
+        "wires": [
+            [
+                "7910442c373cf4a6"
+            ]
+        ]
+    },
+    {
+        "id": "992739d89088730a",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1018",
+        "name": "LocalizedText",
+        "client": "392ec01ef4109c02",
+        "x": 340,
+        "y": 700,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "afa55e7910eb9e3c",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 700,
+        "wires": [
+            [
+                "992739d89088730a"
+            ]
+        ]
+    },
+    {
+        "id": "b7c3e9760627bf72",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1020",
+        "name": "NodeId",
+        "client": "392ec01ef4109c02",
+        "x": 320,
+        "y": 760,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "d0cd9426351cf0d1",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 760,
+        "wires": [
+            [
+                "b7c3e9760627bf72"
+            ]
+        ]
+    },
+    {
+        "id": "609f0b6cf98c36b7",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1019",
+        "name": "QualifiedName",
+        "client": "392ec01ef4109c02",
+        "x": 340,
+        "y": 820,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "b7477054457c5f40",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 820,
+        "wires": [
+            [
+                "609f0b6cf98c36b7"
+            ]
+        ]
+    },
+    {
+        "id": "f1aa1f921f17f7e9",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1003",
+        "name": "SByte",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 880,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "b397fa5795e3c31f",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 880,
+        "wires": [
+            [
+                "f1aa1f921f17f7e9"
+            ]
+        ]
+    },
+    {
+        "id": "c569b3375509d1e3",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1013",
+        "name": "String",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 940,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "02f69f80d376d984",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 940,
+        "wires": [
+            [
+                "c569b3375509d1e3"
+            ]
+        ]
+    },
+    {
+        "id": "bea93dd42622149c",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1006",
+        "name": "UInt16",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 1000,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "1fff90fbf4125781",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 1000,
+        "wires": [
+            [
+                "bea93dd42622149c"
+            ]
+        ]
+    },
+    {
+        "id": "d3ac759dd744a79c",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1008",
+        "name": "UInt32",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 1060,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "5e5ead5251e2849f",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 1060,
+        "wires": [
+            [
+                "d3ac759dd744a79c"
+            ]
+        ]
+    },
+    {
+        "id": "3f4898bad28fac3f",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1010",
+        "name": "UInt64",
+        "client": "392ec01ef4109c02",
+        "x": 310,
+        "y": 1120,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "d44b4ed75051bfbc",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 1120,
+        "wires": [
+            [
+                "3f4898bad28fac3f"
+            ]
+        ]
+    },
+    {
+        "id": "310489cf1b9e4ff8",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "ns=1;i=1017",
+        "name": "XmlElement",
+        "client": "392ec01ef4109c02",
+        "x": 330,
+        "y": 1180,
+        "wires": [
+            [
+                "f04d11cb86b0e139"
+            ]
+        ]
+    },
+    {
+        "id": "3fe646cdedb74a45",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "Read",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 130,
+        "y": 1180,
+        "wires": [
+            [
+                "310489cf1b9e4ff8"
+            ]
+        ]
+    },
+    {
+        "id": "392ec01ef4109c02",
+        "type": "opcua-client",
+        "name": "SIM",
+        "host": "opc.tcp://localhost:4334/UA/node-red-x",
+        "securitypolicy": "None",
+        "messagesecurity": "None",
+        "anonymous": true,
+        "username": "",
+        "password": ""
+    }
+]

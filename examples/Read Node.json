@@ -1,0 +1,182 @@
+[
+    {
+        "id": "00ca436790c52ebc",
+        "type": "tab",
+        "label": "Flow 1",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "fed350e93f5e81bc",
+        "type": "opcua-server",
+        "z": "00ca436790c52ebc",
+        "x": 110,
+        "y": 40,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "7ec0c471ec4eec10",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "i=84",
+        "name": "",
+        "client": "392ec01ef4109c02",
+        "x": 350,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "6faacc0e7497bc6e",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 140,
+        "wires": [
+            [
+                "7ec0c471ec4eec10"
+            ]
+        ]
+    },
+    {
+        "id": "594022543b3af315",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "",
+        "props": [],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 220,
+        "wires": [
+            [
+                "2e6ada4719af545d"
+            ]
+        ]
+    },
+    {
+        "id": "4e0c5165fce69b70",
+        "type": "comment",
+        "z": "00ca436790c52ebc",
+        "name": "Read root folder",
+        "info": "",
+        "x": 120,
+        "y": 100,
+        "wires": []
+    },
+    {
+        "id": "6597f8085bdc0233",
+        "type": "comment",
+        "z": "00ca436790c52ebc",
+        "name": "Invalid NodeId",
+        "info": "",
+        "x": 110,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "08141be70e11403a",
+        "type": "inject",
+        "z": "00ca436790c52ebc",
+        "name": "",
+        "props": [
+            {
+                "p": "nodeId",
+                "v": "ns=1;i=1002",
+                "vt": "str"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "x": 110,
+        "y": 300,
+        "wires": [
+            [
+                "c60b7590a344b36a"
+            ]
+        ]
+    },
+    {
+        "id": "863821b643071a95",
+        "type": "comment",
+        "z": "00ca436790c52ebc",
+        "name": "Valid NodeId from input",
+        "info": "",
+        "x": 140,
+        "y": 260,
+        "wires": []
+    },
+    {
+        "id": "2e6ada4719af545d",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "6876t87gh",
+        "name": "",
+        "client": "392ec01ef4109c02",
+        "x": 350,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "c60b7590a344b36a",
+        "type": "opcua-read",
+        "z": "00ca436790c52ebc",
+        "nodeid": "i=84",
+        "name": "",
+        "client": "392ec01ef4109c02",
+        "x": 350,
+        "y": 300,
+        "wires": [
+            [
+                "909de1ee35135256"
+            ]
+        ]
+    },
+    {
+        "id": "909de1ee35135256",
+        "type": "debug",
+        "z": "00ca436790c52ebc",
+        "name": "Value",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 510,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "392ec01ef4109c02",
+        "type": "opcua-client",
+        "name": "SIM",
+        "host": "opc.tcp://localhost:4334/UA/node-red-x",
+        "securitypolicy": "None",
+        "messagesecurity": "None",
+        "anonymous": true,
+        "username": "",
+        "password": ""
+    }
+]
