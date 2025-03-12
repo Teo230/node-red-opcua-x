@@ -14,7 +14,7 @@ module.exports = function (RED) {
 
         RED.nodes.createNode(this, args);
         const opcuaclientnode = RED.nodes.getNode(args.client);
-        const existingClient = GetClient(opcuaclientnode.connectionId);
+        const opcClient = GetClient(opcuaclientnode.connectionId);
 
         var node = this;
 
@@ -23,10 +23,10 @@ module.exports = function (RED) {
 
         // Read Input Arg node
         node.on('input', function (msg) {
-            if(existingClient.clientState == "reconnecting") return;
-            if(existingClient.clientState == "disconnected") return;
+            if(opcClient.clientState == "reconnecting") return;
+            if(opcClient.clientState == "disconnected") return;
 
-            if (existingClient.session == undefined) {
+            if (opcClient.session == undefined) {
                 node.error("Session not found");
                 return;
             }
@@ -48,7 +48,7 @@ module.exports = function (RED) {
                 nodeId: node.nodeId,
                 attributeId: AttributeIds.Value
             };
-            const dataValue = await existingClient.session.read(nodeToRead);
+            const dataValue = await opcClient.session.read(nodeToRead);
             
             if(!dataValue.statusCode.isGood()){
                 node.error("Something went wrong on read NodeId " + node.nodeId);
