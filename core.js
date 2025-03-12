@@ -130,14 +130,54 @@ function CreateOpcUaServer() {
             buildDate: new Date(2025, 3, 11)
         }
     });
-
-    _initializeServer();
 }
 
-function CloseServer() {
-    opcServer.shutdown(1000, () => {
-        console.log("OPC UA Server shutdown completed");
+async function InitializeServer() {
+
+    await opcServer.initialize();
+    console.log("OPC UA Server initialized");
+
+    const addressSpace = opcServer.engine.addressSpace;
+    const namespace = addressSpace.getOwnNamespace();
+
+    // declare a new object
+    const simNode = namespace.addObject({
+        organizedBy: addressSpace.rootFolder.objects,
+        browseName: "SIM"
     });
+
+    const scalarFolder = namespace.addObject({
+        organizedBy: simNode,
+        browseName: "Scalar",
+        typeDefinition: "FolderType"
+    });
+
+    //Scalar values
+    _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
+    _addVariable(namespace, scalarFolder, DataType[DataType.SByte], DataType.SByte);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Byte], DataType.Byte);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt16], DataType.UInt16);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int32], DataType.Int32);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt32], DataType.UInt32);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Int64], DataType.Int64);
+    _addVariable(namespace, scalarFolder, DataType[DataType.UInt64], DataType.UInt64);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
+    _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
+    _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
+    _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
+    _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
+    _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
+    _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
+    _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
+    _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
+
+    await opcServer.start();
+}
+
+async function CloseServer() {
+    await opcServer.shutdown(1000);
 }
 
 //#region private
@@ -210,51 +250,6 @@ function _updateSessionState(session, state) {
 
     eventEmitter.emit('session_state', session, state);
 }
-
-function _initializeServer() {
-    opcServer.initialize(() => {
-        console.log("OPC UA Server initialized");
-
-        const addressSpace = opcServer.engine.addressSpace;
-        const namespace = addressSpace.getOwnNamespace();
-
-        // declare a new object
-        const simNode = namespace.addObject({
-            organizedBy: addressSpace.rootFolder.objects,
-            browseName: "SIM"
-        });
-
-        const scalarFolder = namespace.addObject({
-            organizedBy: simNode,
-            browseName: "Scalar",
-            typeDefinition: "FolderType"
-        });
-
-        //Scalar values
-        _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
-        _addVariable(namespace, scalarFolder, DataType[DataType.SByte], DataType.SByte);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Byte], DataType.Byte);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
-        _addVariable(namespace, scalarFolder, DataType[DataType.UInt16], DataType.UInt16);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Int32], DataType.Int32);
-        _addVariable(namespace, scalarFolder, DataType[DataType.UInt32], DataType.UInt32);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Int64], DataType.Int64);
-        _addVariable(namespace, scalarFolder, DataType[DataType.UInt64], DataType.UInt64);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
-        _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
-        _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
-        _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
-        _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
-        _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
-        _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
-        _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
-
-        _startServer();
-    });
-}
-
 
 /**
  * Adds a variable to the OPC UA namespace.
@@ -355,13 +350,6 @@ function _getDefaultValue(dataType) {
     return defaultValue;
 }
 
-function _startServer() {
-    opcServer.start(() => {
-        const endpointUrl = opcServer.endpoints[0].endpointDescriptions()[0].endpointUrl;
-        console.log(" the primary server endpoint url is ", endpointUrl);
-    });
-}
-
 //#endregion
 
 //#region export
@@ -376,6 +364,7 @@ module.exports = {
     IsValidNodeId,
     CreateOpcUaServer,
     CloseServer,
+    InitializeServer,
     eventEmitter
 }
 

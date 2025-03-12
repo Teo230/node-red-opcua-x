@@ -5,7 +5,9 @@ module.exports = function (RED) {
         IsValidNodeId
     } = require('./core');
     const {
-        AttributeIds
+        AttributeIds,
+        StatusCodes,
+        StatusCode
     } = require('node-opcua');
 
     function opcUaReadNode(args) {
@@ -47,6 +49,12 @@ module.exports = function (RED) {
                 attributeId: AttributeIds.Value
             };
             const dataValue = await existingClient.session.read(nodeToRead);
+            
+            if(!dataValue.statusCode.isGood()){
+                node.error("Something went wrong on read NodeId " + node.nodeId);
+                return;
+            }
+            
             const dataValueString = JSON.stringify(dataValue);
             const dataValueObj = JSON.parse(dataValueString);
             node.send({ payload: dataValueObj });
