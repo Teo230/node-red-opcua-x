@@ -1,6 +1,6 @@
 # node-red-opcua-x
-<img src="images/node-red-logo.png" alt="drawing" style="height:200px;"/> 
-<!-- <img src="icons/opcua-logo.png" alt="drawing" style="height:200px;"/>  -->
+![GitHub Workflow Status](https://img.shields.io/github/actions/workflow/status/teo230/node-red-opcua-x/npm-publish.yml)
+[![npm version](https://img.shields.io/npm/v/node-red-opcua-x.svg?color=blue)](https://www.npmjs.com/package/node-red-opcua-x) [![npm downloads](https://img.shields.io/npm/dm/node-red-opcua-x.svg?color=blue)](https://www.npmjs.com/package/node-red-opcua-x)
 
 ## What is
 A package that handles OPC UA Client request like read, browse, write, ...
