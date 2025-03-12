@@ -231,15 +231,22 @@ function _initializeServer() {
         });
 
         //Scalar values
-        _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
-        _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
         _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
+        _addVariable(namespace, scalarFolder, DataType[DataType.SByte], DataType.SByte);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Byte], DataType.Byte);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
+        _addVariable(namespace, scalarFolder, DataType[DataType.UInt16], DataType.UInt16);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Int32], DataType.Int32);
+        _addVariable(namespace, scalarFolder, DataType[DataType.UInt32], DataType.UInt32);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Int64], DataType.Int64);
+        _addVariable(namespace, scalarFolder, DataType[DataType.UInt64], DataType.UInt64);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
+        _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
         _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
         _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
         _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
-        _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
         _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
+        _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
         _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
         _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
         _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
@@ -302,7 +309,7 @@ function _getDefaultValue(dataType) {
 
         case DataType.Int64:
         case DataType.UInt64:
-            defaultValue = 0n;
+            defaultValue = Number(0n);
             break;
 
         case DataType.String:
@@ -314,11 +321,11 @@ function _getDefaultValue(dataType) {
             break;
 
         case DataType.DateTime:
-            defaultValue = new Date(0);
+            defaultValue = new Date();
             break;
 
         case DataType.Guid:
-            defaultValue = "00000000-0000-0000-0000-000000000000";
+            defaultValue = "8cae8c9a-a1d6-4e93-b680-d9a20c5a703c";
             break;
 
         case DataType.ByteString:
