@@ -10,9 +10,13 @@ const {
     UAObject
 } = require('node-opcua')
 
-const opcClients = [];
+/**@type {OPCUAClient[]} */
+let opcClients = [];
+
 /** @type {OPCUAServer} */
 let opcServer = null;
+
+/**@type {EventEmitter} */
 const eventEmitter = new EventEmitter();
 
 function CreateOpcUaClient(connectionId, name, authOption) {
@@ -64,7 +68,7 @@ async function Connect(connectionId, host, userOption) {
 }
 
 async function Close(connectionId) {
-    const client = opcClients[connectionId];
+    let client = opcClients[connectionId];
     if (!client) return;
 
     try {
@@ -85,7 +89,7 @@ async function Close(connectionId) {
 }
 
 async function CloseSubscription(session) {
-    const subscription = session.subscription;
+    let subscription = session.subscription;
     if (!subscription) return;
 
     await subscription.terminate();
@@ -184,7 +188,7 @@ function GetServer() { return opcServer; }
 //#region private
 
 async function _closeSession(client) {
-    const session = client.session;
+    let session = client.session;
     if (!session) return;
 
     _removeSessionListeners(session);
@@ -228,26 +232,26 @@ function _removeSessionListeners(session) {
 }
 
 function _notifyClientState(client) {
-    console.debug(client.applicationName + ": " + client._internalState);
+    // console.debug(client.applicationName + ": " + client._internalState);
     eventEmitter.emit('client_state', client);
 }
 
 function _updateSessionState(session, state) {
 
-    switch (state) {
-        case "restored":
-            console.debug(session.sessionId + ": session restored");
-            break
-        case "closed":
-            console.debug(session.sessionId + ": session closed");
-            break;
-        case "keepalive":
-            console.debug(session.sessionId + ": session keepalive");
-            break;
-        case "keepalive_failed":
-            console.debug(session.sessionId + ": session keepalive failed");
-            break;
-    }
+    // switch (state) {
+    //     case "restored":
+    //         console.debug(session.sessionId + ": session restored");
+    //         break
+    //     case "closed":
+    //         console.debug(session.sessionId + ": session closed");
+    //         break;
+    //     case "keepalive":
+    //         console.debug(session.sessionId + ": session keepalive");
+    //         break;
+    //     case "keepalive_failed":
+    //         console.debug(session.sessionId + ": session keepalive failed");
+    //         break;
+    // }
 
     eventEmitter.emit('session_state', session, state);
 }
