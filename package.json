@@ -18,7 +18,6 @@
         "version": ">=2.0.0",
         "nodes": {
             "opcua-client": "opcua-client.js",
-            "opcua-client-state": "opcua-client-state.js",
             "opcua-read": "opcua-read.js",
             "opcua-browse": "opcua-browse.js",
             "opcua-subscription": "opcua-subscription.js",

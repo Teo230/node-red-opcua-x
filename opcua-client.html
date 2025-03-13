@@ -1,86 +1,93 @@
 <script type="text/javascript">
-    RED.nodes.registerType('opcua-client', {
-        category: 'opcuax',
-        color: '#a6bbcf',
-        icon: "opcua-logo.png",
-        defaults: {
-            name: { required: true },
-            host: { required: true },
-            securitypolicy: { value: "None", required: true },
-            messagesecurity: { value: "None", required: true },
-            anonymous: { value: true, required: false },
-            username: { required: false },
-            password: { required: false }
+  RED.nodes.registerType("opcua-client", {
+    category: "opcuax",
+    color: "#a6bbcf",
+    defaults: {
+      name: { required: true },
+      host: { required: true },
+      securitypolicy: { value: "None", required: true },
+      messagesecurity: { value: "None", required: true },
+      anonymous: { value: true, required: false },
+      username: {
+        validate: function (v) {
+          return $("#node-input-anonymous")[0].checked || v != "";
         },
-        paletteLabel:  "opcuax-client",
-        inputs: 0,
-        outputs: 1,
-        label: function () {
-            return this.name || "opcuax-client";
+      },
+      password: {
+        validate: function (v) {
+          return $("#node-input-anonymous")[0].checked || v != "";
         },
-        oneditprepare: function () {
-            $("#node-config-input-securitypolicy").typedInput({
-                types: [
-                    {
-                        options: [
-                            { value: "None", label: "None" },
-                            { value: "Basic256", label: "Basic256" },
-                            { value: "Basic256Sha256", label: "Basic256Sha256" }
-                        ]
-                    }
-                ]
-            });
+      },
+    },
+    paletteLabel: "opcuax-client",
+    inputs: 0,
+    outputs: 1,
+    icon: "opcua-logo.png",
+    label: function () {
+      return this.name || "opcuax-client";
+    },
+    oneditprepare: function () {
+      $("#node-input-securitypolicy").typedInput({
+        types: [
+          {
+            options: [
+              { value: "None", label: "None" },
+              { value: "Basic256", label: "Basic256" },
+              { value: "Basic256Sha256", label: "Basic256Sha256" },
+            ],
+          },
+        ],
+      });
 
-            $("#node-config-input-messagesecurity").typedInput({
-                types: [
-                    {
-                        options: [
-                            { value: "None", label: "None" },
-                            { value: "Sign", label: "Sign" },
-                            { value: "SignAndEncrypt", label: "Sign&Encrypt" }
-                        ]
-                    }
-                ]
-            });
+      $("#node-input-messagesecurity").typedInput({
+        types: [
+          {
+            options: [
+              { value: "None", label: "None" },
+              { value: "Sign", label: "Sign" },
+              { value: "SignAndEncrypt", label: "Sign&Encrypt" },
+            ],
+          },
+        ],
+      });
 
-            $("#node-config-input-anonymous").on('change', function (event) {
-                const value = $("#node-config-input-anonymous")[0].checked;
-                $("#node-config-input-username")[0].readOnly = value;
-                $("#node-config-input-password")[0].readOnly = value;
-            });
-        }
-    });
-
+      $("#node-input-anonymous").on("change", function (event) {
+        const value = $("#node-input-anonymous")[0].checked;
+        $("#node-input-username")[0].readOnly = value;
+        $("#node-input-password")[0].readOnly = value;
+      });
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="opcua-client">
-    <div class="form-row">
-        <label for="node-config-input-name"></i> Name</label>
-        <input type="text" id="node-config-input-name">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-host"><i class="fa fa-server"></i> Host</label>
-        <input type="text" id="node-config-input-host" placeholder="opc.tcp://localhost:4840/">
-    </div>
-    <h4>Authentication Settings</h4>
-    <div class="form-row">
-        <label for="node-config-input-securitypolicy"><i class="fa fa-lock"></i> Security Policy</label>
-        <input type="text" id="node-config-input-securitypolicy">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-messagesecurity"><i class="fa fa-envelope"></i> Message Security Mode</label>
-        <input type="text" id="node-config-input-messagesecurity">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-anonymous">Anonymous</label>
-        <input type="checkbox" id="node-config-input-anonymous" style="margin: 5px 0px; width: auto;">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-username">Username</label>
-        <input type="text" id="node-config-input-username">
-    </div>
-    <div class="form-row">
-        <label for="node-config-input-password">Password</label>
-        <input type="password" id="node-config-input-password">
-    </div>
+  <div class="form-row">
+      <label for="node-input-name"></i> Name</label>
+      <input type="text" id="node-input-name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-host"><i class="fa fa-server"></i> Host</label>
+      <input type="text" id="node-input-host" placeholder="opc.tcp://localhost:4840/">
+  </div>
+  <h4>Authentication Settings</h4>
+  <div class="form-row">
+      <label for="node-input-securitypolicy"><i class="fa fa-lock"></i> Security Policy</label>
+      <input type="text" id="node-input-securitypolicy">
+  </div>
+  <div class="form-row">
+      <label for="node-input-messagesecurity"><i class="fa fa-envelope"></i> Message Security Mode</label>
+      <input type="text" id="node-input-messagesecurity">
+  </div>
+  <div class="form-row">
+      <label for="node-input-anonymous">Anonymous</label>
+      <input type="checkbox" id="node-input-anonymous" style="margin: 5px 0px; width: auto;">
+  </div>
+  <div class="form-row">
+      <label for="node-input-username">Username</label>
+      <input type="text" id="node-input-username">
+  </div>
+  <div class="form-row">
+      <label for="node-input-password">Password</label>
+      <input type="password" id="node-input-password">
+  </div>
 </script>

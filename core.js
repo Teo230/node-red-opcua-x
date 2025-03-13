@@ -139,7 +139,7 @@ function CreateOpcUaServer() {
 async function InitializeServer() {
 
     await opcServer.initialize();
-
+    
     const addressSpace = opcServer.engine.addressSpace;
     const namespace = addressSpace.getOwnNamespace();
 

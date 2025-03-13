@@ -4,8 +4,7 @@
         color: '#a6bbcf',
         defaults: {
             nodeid: { required: true },
-            name: { value: "" },
-            client: { value: "", required: true, type: "opcua-client" }
+            name: { value: "" },  
         },
         inputs: 1,
         outputs: 1,
@@ -25,10 +24,6 @@
     <div class="form-row">
         <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
         <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
-    </div>
-    <div class="form-row">
-        <label for="node-input-client"><i class="fa fa-plug"></i> Client</label>
-        <input type="text" id="node-input-client" placeholder="">
     </div>
 </script>
 

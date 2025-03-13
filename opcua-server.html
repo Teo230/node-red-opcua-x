@@ -3,6 +3,9 @@
         category: 'opcuax',
         color: '#a6bbcf',
         defaults: {
+            name: {value:""},
+            port: {value: 4334, required: true},
+            endpoint:  {value: "localhost", required: true},
         },
         inputs: 1,
         outputs: 0,
@@ -29,21 +32,5 @@
     <div class="form-row">
         <label for="node-input-endpoint"><i class="icon-tag"></i> Endpoint</label>
         <input type="text" id="node-input-endpoint" placeholder="Endpoint">
-    </div>
-    <div class="form-row">
-        <label for="node-input-securityPolicy"><i class="icon-tag"></i> Security Policy</label>
-        <input type="text" id="node-input-securityPolicy" placeholder="Security Policy">
-    </div>
-    <div class="form-row">
-        <label for="node-input-securityMode"><i class="icon-tag"></i> Security Mode</label>
-        <input type="text" id="node-input-securityMode" placeholder="Security Mode">
-    </div>
-    <div class="form-row">
-        <label for="node-input-username"><i class="icon-tag"></i> Username</label>
-        <input type="text" id="node-input-username" placeholder="Username">
-    </div>
-    <div class="form-row">
-        <label for="node-input-password"><i class="icon-tag"></i> Password</label>
-        <input type="password" id="node-input-password" placeholder="Password">
     </div>
 </script>
