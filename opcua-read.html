@@ -1,32 +1,36 @@
 <script type="text/javascript">
-    RED.nodes.registerType('opcua-read', {
-        category: 'opcuax',
-        color: '#a6bbcf',
-        defaults: {
-            nodeid: { required: true },
-            name: { value: "" },  
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "opcua-logo.png",
-        paletteLabel:  "read",
-        label: function () {
-            return this.name || "read";
-        }
-    });
+  RED.nodes.registerType("opcua-read", {
+    category: "opcuax",
+    color: "#a6bbcf",
+    defaults: {
+      nodeId: { value: "" },
+      name: { value: "" },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "opcua-logo.png",
+    paletteLabel: "read",
+    label: function () {
+      return this.name || "read";
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="opcua-read">
-    <div class="form-row">
-        <label for="node-input-name"></i> Name</label>
-        <input type="text" id="node-input-name" placeholder="Name">
-    </div>
-    <div class="form-row">
-        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
-        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
-    </div>
+  <div class="form-row">
+      <label for="node-input-name"></i> Name</label>
+      <input type="text" id="node-input-name" placeholder="Name">
+  </div>
+  <div class="form-row">
+      <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
+      <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
+  </div>
 </script>
-
 <script type="text/html" data-help-name="opcua-read">
-    <p>Simple Hello World node</p>
+  <p>This node allows you to read data from an OPC UA server.</p>
+  <p><b>Name</b> - The name of the node.</p>
+  <p>
+    <b>NodeId</b> - The NodeId of the item to read from the OPC UA server. The
+    format should be "ns=*;i=*" or "ns=*;s=*".
+  </p>
 </script>

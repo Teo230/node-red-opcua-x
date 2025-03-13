@@ -41,3 +41,30 @@
   }
 }
 ```
+
+# read
+
+## Input
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier (Mandatory)
+  "opcuax_read": {
+    "nodeId": "" //Unique node identifier (Optional)
+  }
+}
+```
+
+## Output
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier
+  "opcuax_read": {
+    "nodeId": "", //Unique node identifier
+    "result": {} //Browse result
+  }
+}
+```

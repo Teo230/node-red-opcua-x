@@ -11,53 +11,69 @@ module.exports = function (RED) {
     } = require('node-opcua');
 
     function opcUaReadNode(args) {
-
         RED.nodes.createNode(this, args);
-        const opcuaclientnode = RED.nodes.getNode(args.client);
-        const opcClient = GetClient(opcuaclientnode.connectionId);
 
         var node = this;
 
         node.name = args.name;
-        node.nodeId = args.nodeid;
 
         // Read Input Arg node
         node.on('input', function (msg) {
-            if(opcClient.clientState == "reconnecting") return;
-            if(opcClient.clientState == "disconnected") return;
 
-            if (opcClient.session == undefined) {
+            node.opcuax_client_id = msg.opcuax_client_id;
+            const client = GetClient(node.opcuax_client_id);
+
+            if (!client) {
+                node.error("OPC UA Client not defined");
+                return;
+            }
+
+            if (client.session == undefined) {
                 node.error("Session not found");
                 return;
             }
-            
+
             // Override nodeId from incoming node if not defined on read node
-            if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
+            node.nodeId = msg.opcuax_read?.nodeId;
+            if (!node.nodeId) node.nodeId = args.nodeId;
+
+            if (!node.nodeId) {
+                node.error("NodeId not defined");
+                return;
+            }
 
             const isValid = IsValidNodeId(node.nodeId);
-            if(!isValid){
+            if (!isValid) {
                 node.error(node.nodeId + " is not a valid NodeId");
                 return;
             }
 
-            readNode();
+            readNode(client);
         });
 
-        async function readNode() {
+        async function readNode(client) {
             const nodeToRead = {
                 nodeId: node.nodeId,
                 attributeId: AttributeIds.Value
             };
-            const dataValue = await opcClient.session.read(nodeToRead);
-            
-            if(!dataValue.statusCode.isGood()){
+            const dataValue = await client.session.read(nodeToRead);
+
+            if (!dataValue.statusCode.isGood()) {
                 node.error("Something went wrong on read NodeId " + node.nodeId);
                 return;
             }
-            
+
             const dataValueString = JSON.stringify(dataValue);
             const dataValueObj = JSON.parse(dataValueString);
-            node.send({ payload: dataValueObj });
+
+            node.send({
+                payload: node.payload,
+                opcuax_client_id: node.opcuax_client_id,
+                opcuax_read: {
+                    nodeId: node.nodeId,
+                    result: dataValueObj
+                }
+            });
         }
     }
 

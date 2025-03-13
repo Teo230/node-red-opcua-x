@@ -46,8 +46,8 @@ module.exports = function (RED) {
             browseNode(client);
         });
 
-        async function browseNode(opcClient) {
-            const browseResult = await opcClient.session.browse(node.nodeId);
+        async function browseNode(client) {
+            const browseResult = await client.session.browse(node.nodeId);
 
             items = [browseResult.references.length];
             for (const index in browseResult.references) {
