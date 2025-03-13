@@ -10,12 +10,12 @@
       anonymous: { value: true, required: false },
       username: {
         validate: function (v) {
-          return $("#node-input-anonymous")[0].checked || v != "";
+          return $("#node-input-anonymous")[0]?.checked || v != "";
         },
       },
       password: {
         validate: function (v) {
-          return $("#node-input-anonymous")[0].checked || v != "";
+          return $("#node-input-anonymous")[0]?.checked || v != "";
         },
       },
     },

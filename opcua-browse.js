@@ -7,16 +7,16 @@ module.exports = function (RED) {
 
     function opcUaBrowseNode(args) {
         RED.nodes.createNode(this, args);
-        
+
         let node = this;
 
         node.name = args.name;
-        node.nodeId = args.nodeId;
 
         // Read Input Arg node
         node.on('input', function (msg) {
 
-            const client = GetClient(msg.opcuax_browse.connectionId);
+            node.opcuax_client_id = msg.opcuax_client_id;
+            const client = GetClient(node.opcuax_client_id);
 
             if (!client) {
                 node.error("OPC UA Client not defined");
@@ -28,16 +28,17 @@ module.exports = function (RED) {
                 return;
             }
 
-            if(!args.nodeId && !msg.nodeId){
+            // Override nodeId from incoming node if not defined on read node
+            node.nodeId = msg.opcuax_browse?.nodeId;
+            if (!node.nodeId) node.nodeId = args.nodeId;
+
+            if (!node.nodeId) {
                 node.error("NodeId not defined");
                 return;
             }
 
-            // Override nodeId from incoming node if not defined on read node
-            if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
-            
             const isValid = IsValidNodeId(node.nodeId);
-            if(!isValid){
+            if (!isValid) {
                 node.error(node.nodeId + " is not a valid NodeId");
                 return;
             }
@@ -56,7 +57,14 @@ module.exports = function (RED) {
                 items[index] = browseItemObj;
             }
 
-            node.send({ payload: items });
+            node.send({
+                payload: node.payload,
+                opcuax_client_id: node.opcuax_client_id,
+                opcuax_browse: {
+                    nodeId: node.nodeId,
+                    result: items
+                }
+            });
         }
 
     }

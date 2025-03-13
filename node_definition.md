@@ -1,30 +1,43 @@
-# TODO
-
 # opcuax-client
 
 ## Output
+
 ```json
 {
-    payload: [...],
-    opcuax_client: {
-        connectionId: "",       //Unique client identifier
-        clientName: "",         //Client name
-        applicationName: "",    //Application anem
-        sessionName: "",        //Session name
-        endpointUrl: ""         //Server endpoint url
-    }
+  "payload": {},
+  "opcuax_client_id": "",
+  "opcuax_client": {
+    "clientName": "", //Client name
+    "applicationName": "", //Application anem
+    "sessionName": "", //Session name
+    "endpointUrl": "" //Server endpoint url
+  }
 }
 ```
 
 # browse
 
 ## Input
+
 ```json
 {
-    payload: {},
-    opcuax_browse{
-        connectionId: "",       //Unique client identifier (Mandatory)
-        nodeId: ""              //Unique node identifier (Optional)
-    }
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier (Mandatory)
+  "opcuax_browse": {
+    "nodeId": "" //Unique node identifier (Optional)
+  }
+}
+```
+
+## Output
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier
+  "opcuax_browse": {
+    "nodeId": "", //Unique node identifier
+    "result": [] //Browse result
+  }
 }
 ```

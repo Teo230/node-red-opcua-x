@@ -3,8 +3,7 @@ module.exports = function (RED) {
     const {
         CreateOpcUaClient,
         Connect,
-        Close,
-        eventEmitter
+        Close
     } = require('./core');
     const {
         SecurityPolicy,
@@ -24,7 +23,7 @@ module.exports = function (RED) {
         let node = this;
         let state = "disconnected";
 
-        node.connectionId = args.id; //unique identifier to recognize the cached client
+        node.opcuax_client_id = args.id; //unique identifier to recognize the cached client
         node.name = args.name; //unique name identifier
         node.host = args.host; //opc.tcp
 
@@ -35,7 +34,7 @@ module.exports = function (RED) {
         }
 
         node.debug('Setup opc client for ' + node.name);
-        const client = CreateOpcUaClient(node.connectionId, node.name, authOption);
+        const client = CreateOpcUaClient(node.opcuax_client_id, node.name, authOption);
 
         // Connect client
         connect();
@@ -52,7 +51,7 @@ module.exports = function (RED) {
                 userName: args.username,
                 password: args.password
             }
-            await Connect(node.connectionId, node.host, userOption);
+            await Connect(node.opcuax_client_id, node.host, userOption);
         }
 
         function checkServerConnection() {
@@ -76,19 +75,19 @@ module.exports = function (RED) {
         }
 
         async function onNodeClosed(done) {
-            await Close(node.connectionId);
+            await Close(node.opcuax_client_id);
             done();
         }
 
         function onNodeError() {
-            Close(node.connectionId);
+            Close(node.opcuax_client_id);
         }
 
         function sendData() {
             node.send({
-                payload: payload,
+                payload: node.payload,
+                opcuax_client_id: node.opcuax_client_id,
                 opcuax_client: {
-                    connectionId: node.connectionId,
                     clientName: client.clientName,
                     applicationName: client.applicationName,
                     sessionName: client.session.name,
