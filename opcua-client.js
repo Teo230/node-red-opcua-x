@@ -4,6 +4,7 @@ module.exports = function (RED) {
         CreateOpcUaClient,
         Connect,
         Close,
+        eventEmitter
     } = require('./core');
     const {
         SecurityPolicy,
@@ -15,15 +16,15 @@ module.exports = function (RED) {
     function opcUaClientNode(args) {
         RED.nodes.createNode(this, args);
 
-        if(args.name === undefined) return;
-        if(args.host === undefined) return;
-        if(args.securitypolicy === undefined) return;
-        if(args.messagesecurity === undefined) return;
+        if (args.name === undefined) return;
+        if (args.host === undefined) return;
+        if (args.securitypolicy === undefined) return;
+        if (args.messagesecurity === undefined) return;
 
         let node = this;
         let state = "disconnected";
 
-        node.connectionId = args.id;
+        node.connectionId = args.id; //unique identifier to recognize the cached client
         node.name = args.name; //unique name identifier
         node.host = args.host; //opc.tcp
 
@@ -52,8 +53,6 @@ module.exports = function (RED) {
                 password: args.password
             }
             await Connect(node.connectionId, node.host, userOption);
-
-            sendData();
         }
 
         function checkServerConnection() {
@@ -62,8 +61,10 @@ module.exports = function (RED) {
                 state = client._internalState;
 
                 switch (state) {
+                    case "after_reconnection":
                     case "connected":
                         node.status({ fill: "green", shape: "dot", text: state });
+                        sendData();
                         break;
                     default:
                         node.status({ fill: "yellow", shape: "ring", text: state });
@@ -83,13 +84,18 @@ module.exports = function (RED) {
             Close(node.connectionId);
         }
 
-        function sendData(){
-            // node.send({
-            //     paylaod: {
-            //         clientName: client.clientName,
-            //         sessionName: client.session.name
-            //     }
-            // });
+        function sendData() {
+            node.send({
+                payload: payload,
+                opcuax_client: {
+                    connectionId: node.connectionId,
+                    clientName: client.clientName,
+                    applicationName: client.applicationName,
+                    sessionName: client.session.name,
+                    endpointUrl: client.endpointUrl
+                    //state: client._internalState
+                }
+            });
         }
 
         //#endregion

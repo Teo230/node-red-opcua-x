@@ -206,6 +206,7 @@ function _attachClientListeners(client) {
     client.on("connection_reestablished", () => _notifyClientState(client));
     client.on("connection_lost", () => _notifyClientState(client));
     client.on("start_reconnection", () => _notifyClientState(client));
+    client.on("after_reconnection", () => _notifyClientState(client));
 }
 
 function _removeClientListeners(client) {
@@ -215,6 +216,7 @@ function _removeClientListeners(client) {
     client.removeListener("connection_reestablished", () => _notifyClientState(client));
     client.removeListener("connection_lost", () => _notifyClientState(client));
     client.removeListener("start_reconnection", () => _notifyClientState(client));
+    client.removeListener("after_reconnection", () => _notifyClientState(client));
 }
 
 function _attachSessionListeners(session) {

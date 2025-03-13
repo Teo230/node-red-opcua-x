@@ -8,9 +8,6 @@ module.exports = function (RED) {
     function opcUaBrowseNode(args) {
         RED.nodes.createNode(this, args);
         
-        const opcuaclientnode = RED.nodes.getNode(args.client);
-        const client = GetClient(opcuaclientnode.connectionId);
-
         let node = this;
 
         node.name = args.name;
@@ -18,6 +15,8 @@ module.exports = function (RED) {
 
         // Read Input Arg node
         node.on('input', function (msg) {
+
+            const client = GetClient(msg.opcuax_browse.connectionId);
 
             if (!client) {
                 node.error("OPC UA Client not defined");
