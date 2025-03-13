@@ -68,3 +68,31 @@
   }
 }
 ```
+
+# subscribe
+
+## Input
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier (Mandatory)
+  "opcuax_subscribe": {
+    "nodeId": "", //Unique node identifier (Optional)
+    "samplingInterval": 100 // 
+  }
+}
+```
+
+## Output
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier
+  "opcuax_subscribe": {
+    "nodeId": "", //Unique node identifier
+    "result": {} //Browse result
+  }
+}
+```

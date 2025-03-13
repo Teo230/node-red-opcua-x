@@ -1,28 +1,36 @@
 <script type="text/javascript">
-    RED.nodes.registerType('opcua-subscription', {
-        category: 'opcuax',
-        color: '#a6bbcf',
-        defaults: {
-            nodeid: { required: true },
-            samplinginterval: { value: 100, required: true }
-        },
-        inputs: 1,
-        outputs: 1,
-        icon: "opcua-logo.png",
-        paletteLabel:  "subscribe",
-        label: function () {
-            return this.name || "subscribe";
-        }
-    });
+  RED.nodes.registerType("opcua-subscription", {
+    category: "opcuax",
+    color: "#a6bbcf",
+    defaults: {
+      nodeId: { value: "" },
+      samplingInterval: { value: 100 },
+    },
+    inputs: 1,
+    outputs: 1,
+    icon: "opcua-logo.png",
+    paletteLabel: "subscribe",
+    label: function () {
+      return this.name || "subscribe";
+    },
+  });
 </script>
 
 <script type="text/html" data-template-name="opcua-subscription">
-    <div class="form-row">
-        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
-        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
-    </div>
-    <div class="form-row">
-        <label for="node-input-samplinginterval">Sampling Interval (ms)</label>
-        <input type="number" id="node-input-samplinginterval" placeholder="Interval in milliseconds">
-    </div>
+  <div class="form-row">
+    <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
+    <input
+      type="text"
+      id="node-input-nodeId"
+      placeholder="ns=*;i=*, ns=*;s=*"
+    />
+  </div>
+  <div class="form-row">
+    <label for="node-input-samplingInterval">Sampling Interval (ms)</label>
+    <input
+      type="number"
+      id="node-input-samplingInterval"
+      placeholder="Interval in milliseconds"
+    />
+  </div>
 </script>

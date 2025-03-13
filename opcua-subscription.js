@@ -13,52 +13,72 @@ module.exports = function (RED) {
     } = require('node-opcua');
 
     function opcUaSubscriptionNode(args) {
-
         RED.nodes.createNode(this, args);
-        const opcuaclientnode = RED.nodes.getNode(args.client);
 
         let node = this;
-        node.nodeId = args.nodeid;
-        node.samplinginterval = args.samplinginterval;
-
-        const isValid = IsValidNodeId(node.nodeId);
-        if(!isValid){
-            node.error(node.nodeId + " is not a valid NodeId");
-            return;
-        }
-
-        node.on('close', onNodeClosed);
         let monitoredItem = new ClientMonitoredItem();
 
-        eventEmitter.on('subscription_created', onSubscriptionCreated);
+        node.samplingInterval = args.samplingInterval;
 
-        function onSubscriptionCreated(connectionId) {
-            const existingClient = GetClient(connectionId);
-            let subscription = existingClient.session.subscription;
-            if (monitoredItem?.monitoredItemId) return;
-            monitorItem(subscription);
-        }
+        node.on('input', function (msg) {
+
+            node.opcuax_client_id = msg.opcuax_client_id;
+            const client = GetClient(node.opcuax_client_id);
+
+            if (!client) {
+                node.error("OPC UA Client not defined");
+                return;
+            }
+
+            if (client.session == undefined) {
+                node.error("Session not found");
+                return;
+            }
+
+            // Override nodeId from incoming node if not defined on read node
+            node.nodeId = msg.opcuax_subscribe?.nodeId;
+            if (!node.nodeId) node.nodeId = args.nodeId;
+
+            if (!node.nodeId) {
+                node.error("NodeId not defined");
+                return;
+            }
+
+            if(msg.opcuax_subscribe?.samplingInterval != undefined) node.samplingInterval = msg.opcuax_subscribe.samplingInterval;
+
+            monitorItem(client);
+        });
+        node.on('close', onNodeClosed);
+        node.on('error', onNodeError);
 
         async function onNodeClosed(done) {
-            eventEmitter.removeListener('subscription_created', onSubscriptionCreated);
-
             if (monitoredItem?.monitoredItemId) {
                 monitoredItem.removeListener("changed", onMonitoredItemDataChanged);
-                monitoredItem.terminate();
+                // await monitoredItem.terminate(); //TODO - Not working
                 monitoredItem = null;
             }
 
             done();
         }
 
-        function monitorItem(subscription) {
+        async function onNodeError() {
+            if (monitoredItem?.monitoredItemId) {
+                monitoredItem.removeListener("changed", onMonitoredItemDataChanged);
+                // await monitoredItem.terminate(); //TODO - Not working
+                monitoredItem = null;
+            }
+        }
+
+        function monitorItem(client) {
+            const subscription = client.session.subscription;
+
             const itemToMonitor = {
                 nodeId: node.nodeId,
                 attributeId: AttributeIds.Value
             };
 
             const parameters = {
-                samplingInterval: node.samplinginterval,
+                samplingInterval: node.samplingInterval,
                 discardOldest: true,
                 queueSize: 10
             };
@@ -73,10 +93,17 @@ module.exports = function (RED) {
             monitoredItem.on("changed", onMonitoredItemDataChanged);
         }
 
-        function onMonitoredItemDataChanged(dataValue){
+        function onMonitoredItemDataChanged(dataValue) {
             const dataValueString = JSON.stringify(dataValue);
             const dataValueObj = JSON.parse(dataValueString);
-            node.send({ payload: dataValueObj });
+            node.send({
+                payload: node.payload,
+                opcuax_client_id: node.opcuax_client_id,
+                opcuax_subscribe: {
+                    nodeId: node.nodeId,
+                    result: dataValueObj
+                }
+            });
         }
     }
 

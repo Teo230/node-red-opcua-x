@@ -59,7 +59,7 @@ async function Connect(connectionId, host, userOption) {
         _attachSessionListeners(session);
 
         client['session'] = session;
-        CreateSubscription(connectionId, session);
+        CreateSubscription(session);
     }
     catch (err) {
         console.error(err.message);
@@ -96,7 +96,7 @@ async function CloseSubscription(session) {
     subscription = null;
 }
 
-function CreateSubscription(connectionId, session) {
+function CreateSubscription(session) {
     if (session.subscription) return session.subscription;
 
     const subscriptionOptions = {
@@ -110,8 +110,6 @@ function CreateSubscription(connectionId, session) {
 
     const subscription = ClientSubscription.create(session, subscriptionOptions);
     session['subscription'] = subscription;
-    eventEmitter.emit('subscription_created', connectionId);
-
     return subscription;
 }
 
