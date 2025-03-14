@@ -6,8 +6,7 @@
             name: { value: "" },
             parentNodeId: { value: "" },
             nodeId: { value: "" },
-            // inputargs: { value: [], required: false },
-            // outputargs: { value: [], required: false },
+            inputArguments: { value: [] }
         },
         inputs: 1,
         outputs: 1,
@@ -15,6 +14,65 @@
         paletteLabel: "call",
         label: function () {
             return this.name || "call";
+        },
+        oneditprepare: function () {
+            $("#node-input-inputArguments").css('height', 'auto').editableList({
+                sortable: true,
+                removable: true,
+                addButton: "Add argument",
+                addItem: function (container, i, data) {
+                    var row = $('<div style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
+
+                    // Value Input and Type Selection using TypedInput
+                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;">')
+                        .appendTo(row)
+                        .val(data ? data.value : "")
+                        .attr('placeholder', 'Value');
+
+                    var position = $('<span style="margin-left: 5px;"> → <span class="node-input-rule-index">' + i + '</span> </span>').appendTo(row);
+
+                    // Hidden field to store the selected type (if needed for later use)
+                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
+
+                    valueInput.typedInput({
+                        type: data && data.dataType ? data.dataType : "str", // Initialize with existing type or default to string
+                        types: ["str", "num", "bool", "json"],
+                        typeField: typeField,
+                        onChange: function (type, value) {
+                            data.dataType = type;
+                            data.value = value;
+                        }
+                    });
+
+                    // Initialize data if it doesn't exist
+                    if (!data) {
+                        data = { dataType: "str", value: "" };
+                    }
+
+                    // Load existing input arguments
+                    var args = this.inputArguments || [];
+                    container.editableList('addItems', args);
+                },
+                removeItem: function (opt) {
+                    var rules = $('#node-input-inputArguments').editableList('items');
+                    rules.each(function (i) {
+                        $(this).find('.node-input-rule-index').html(i);
+                    });
+                },
+                sortItems: function () {
+                    var rules = $('#node-input-inputArguments').editableList('items');
+                    rules.each(function (i) {
+                        $(this).find('.node-input-rule-index').html(i);
+                    });
+                }
+            });
+        },
+        oneditresize: function () {
+            var dialogForm = $('#dialog-form');
+            var rowName = $('.form-row-name', dialogForm);
+            var rowLabel = $('.form-row-label', dialogForm);
+            var height = dialogForm.height() - rowName.height() - rowLabel.height() - 30;
+            $('#node-input-inputArguments').editableList('height', height);
         }
     });
 </script>
@@ -32,17 +90,16 @@
         <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
         <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
     </div>
-    <!-- <h4>Input Arguments</h4>
-    <div class="form-row">
-        <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
-            <ol id="node-input-property-container"></ol>
-        </div>    
-    </div>
+
+    <h4>Input Arguments</h4>
+    <div class="form-row node-input-inputArguments-row">
+        <ol id="node-input-inputArguments"></ol>
+    </div>  
 
     <h4>Output Arguments</h4>
     <div class="form-row">
-        <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
+        <div class="form-row node-input-property-container-row">
             <ol id="node-input-property-container"></ol>
         </div>
-    </div> -->
+    </div>
 </script>
