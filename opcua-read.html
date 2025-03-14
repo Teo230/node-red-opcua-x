@@ -16,6 +16,26 @@
   });
 </script>
 
+<script type="text/html" data-help-name="opcua-read">
+  <p>This node allows you to read data from an OPC UA server.</p>
+  <h3>Inputs</h3>
+  <ul>
+    <li><b>Payload</b>: The input message payload is not used by this node.</li>
+  </ul>
+  <h3>Outputs</h3>
+  <ul>
+    <li><b>Payload</b>: The output message payload will contain the data read from the OPC UA server.</li>
+  </ul>
+  <h3>Properties</h3>
+  <ul>
+    <li><b>Name</b>: The name of the node, which can be used to identify it in the flow.</li>
+    <li><b>NodeId</b>: The NodeId of the OPC UA variable to read. This should be in the format <code>ns=*;i=*</code> or <code>ns=*;s=*</code>.</li>
+  </ul>
+  <h3>Usage</h3>
+  <p>To use this node, drag it into your flow and configure the <b>NodeId</b> property to specify the OPC UA variable you want to read. Optionally, you can also set the <b>Name</b> property to help identify the node in your flow.</p>
+  <p>When the node receives an input message, it will read the specified variable from the OPC UA server and output the value in the message payload.</p>
+</script>
+
 <script type="text/html" data-template-name="opcua-read">
   <div class="form-row">
       <label for="node-input-name"></i> Name</label>
@@ -25,12 +45,4 @@
       <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
       <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
   </div>
-</script>
-<script type="text/html" data-help-name="opcua-read">
-  <p>This node allows you to read data from an OPC UA server.</p>
-  <p><b>Name</b> - The name of the node.</p>
-  <p>
-    <b>NodeId</b> - The NodeId of the item to read from the OPC UA server. The
-    format should be "ns=*;i=*" or "ns=*;s=*".
-  </p>
 </script>

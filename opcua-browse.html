@@ -16,6 +16,30 @@
     });
 </script>
 
+<script type="text/html" data-help-name="opcua-browse">
+    <p>The browse node allows you to browse the OPC UA server's address space.</p>
+    <h4>Properties</h4>
+    <ul>
+        <li><b>Name</b>: The name of the node. This is an optional field.</li>
+        <li><b>NodeId</b>: The NodeId to browse. This is a required field and should be in the format <code>ns=*;i=*</code> or <code>ns=*;s=*</code>.</li>
+    </ul>
+    <h4>Inputs</h4>
+    <p>This node has one input. It accepts a message object with the following properties:</p>
+    <ul>
+        <li><b>payload</b>: The payload of the message.</li>
+        <li><b>opcuax_client_id</b>: The ID of the OPC UA client used for the browse operation. This is useful for tracking which client instance performed the browse.</li>
+        <li><b>opcuax_browse</b>: It can be used to set dynamically the NodeId</li>
+    </ul>
+    <h4>Outputs</h4>
+    <p>This node has one output. It returns a message object with the following properties:</p>
+    <ul>
+        <li><b>payload</b>: The payload of the message.</li>
+        <li><b>opcuax_client_id</b>: The ID of the OPC UA client used for the browse operation. This is useful for tracking which client instance performed the browse.</li>
+        <li><b>opcuax_browse</b>: The result of the browse operation. This will be an array of references found during the browse.</li>
+    </ul>
+    <h4>Usage</h4>
+    <p>To use this node, drag it into your flow, configure the NodeId, and connect it to other nodes. When a message is received, the node will browse the specified NodeId and return the results in the <code>msg.opcuax_browse</code>.</p>
+</script>
 <script type="text/html" data-template-name="opcua-browse">
     <div class="form-row">
         <label for="node-input-name"></i> Name</label>
@@ -27,6 +51,3 @@
     </div>
 </script>
 
-<script type="text/html" data-help-name="opcua-read">
-    <p>Simple Hello World node</p>
-</script>

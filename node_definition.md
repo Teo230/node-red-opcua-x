@@ -79,7 +79,7 @@
   "opcuax_client_id": "", //Unique client identifier (Mandatory)
   "opcuax_subscribe": {
     "nodeId": "", //Unique node identifier (Optional)
-    "samplingInterval": 100 // 
+    "samplingInterval": 100 //Fastest rate in ms at which the downstream server should sample its underlying source for data changes
   }
 }
 ```

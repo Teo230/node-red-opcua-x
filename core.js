@@ -7,7 +7,9 @@ const {
     Variant,
     StatusCodes,
     DataType,
-    UAObject
+    AccessLevelFlag,
+    UAObject,
+    UAVariable
 } = require('node-opcua')
 
 /**@type {OPCUAClient[]} */
@@ -122,59 +124,24 @@ function GetClient(connectionId) {
     return opcClients[connectionId];
 }
 
-function CreateOpcUaServer() {
+/**
+ * Creates an OPC UA Server instance.
+ *
+ * @param {string} resourcePath - The resource path for the OPC UA server.
+ * @param {number} port - The port number on which the OPC UA server will listen.
+ * @returns {OPCUAServer} The created OPC UA server instance.
+ */
+function CreateOpcUaServer(resourcePath, port) {
     opcServer = new OPCUAServer({
-        port: 4334,
-        resourcePath: "/UA/node-red-x",
+        port: port,
+        resourcePath: resourcePath,
         buildInfo: {
-            productName: "MySimulatedNodeRedXServer",
-            buildNumber: "7658",
-            buildDate: new Date(2025, 3, 11)
+            buildNumber: _generateRandomBuildNumber(),
+            buildDate: new Date()
         }
     });
-}
 
-async function InitializeServer() {
-
-    await opcServer.initialize();
-    
-    const addressSpace = opcServer.engine.addressSpace;
-    const namespace = addressSpace.getOwnNamespace();
-
-    // declare a new object
-    const simNode = namespace.addObject({
-        organizedBy: addressSpace.rootFolder.objects,
-        browseName: "SIM"
-    });
-
-    const scalarFolder = namespace.addObject({
-        organizedBy: simNode,
-        browseName: "Scalar",
-        typeDefinition: "FolderType"
-    });
-
-    //Scalar values
-    _addVariable(namespace, scalarFolder, DataType[DataType.Boolean], DataType.Boolean);
-    _addVariable(namespace, scalarFolder, DataType[DataType.SByte], DataType.SByte);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Byte], DataType.Byte);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Int16], DataType.Int16);
-    _addVariable(namespace, scalarFolder, DataType[DataType.UInt16], DataType.UInt16);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Int32], DataType.Int32);
-    _addVariable(namespace, scalarFolder, DataType[DataType.UInt32], DataType.UInt32);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Int64], DataType.Int64);
-    _addVariable(namespace, scalarFolder, DataType[DataType.UInt64], DataType.UInt64);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Float], DataType.Float);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Double], DataType.Double);
-    _addVariable(namespace, scalarFolder, DataType[DataType.String], DataType.String);
-    _addVariable(namespace, scalarFolder, DataType[DataType.DateTime], DataType.DateTime);
-    _addVariable(namespace, scalarFolder, DataType[DataType.Guid], DataType.Guid);
-    _addVariable(namespace, scalarFolder, DataType[DataType.ByteString], DataType.ByteString);
-    _addVariable(namespace, scalarFolder, DataType[DataType.XmlElement], DataType.XmlElement);
-    _addVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
-    _addVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
-    _addVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
-
-    await opcServer.start();
+    return opcServer;
 }
 
 async function CloseServer() {
@@ -182,6 +149,29 @@ async function CloseServer() {
 }
 
 function GetServer() { return opcServer; }
+
+/**
+ * Adds a variable to the OPC UA namespace.
+ *
+ * @param {object} namespace - The namespace object to which the variable will be added.
+ * @param {UAObject} parentNode - The parent node under which the variable will be added.
+ * @param {string} browseName - The browse name of the variable.
+ * @param {DataType} dataType - The data type of the variable.
+ * @returns {UAVariable} - The generated OPC Variable.
+ */
+function AddVariable(namespace, parentNode, browseName, dataType) {
+    return namespace.addVariable({
+        componentOf: parentNode,
+        browseName: browseName,
+        dataType: dataType,
+        accessLevel: AccessLevelFlag.CurrentRead | AccessLevelFlag.CurrentWrite,
+        value: new Variant({
+            dataType: dataType,
+            //arrayType: VariantArrayType.Scalar,
+            value: _getDefaultValue(dataType)
+        })
+    });
+}
 
 //#region private
 
@@ -257,34 +247,6 @@ function _updateSessionState(session, state) {
 }
 
 /**
- * Adds a variable to the OPC UA namespace.
- *
- * @param {Object} namespace - The namespace object to which the variable will be added.
- * @param {import('node-opcua').UAObject} parentNode - The parent node under which the variable will be added.
- * @param {string} browseName - The browse name of the variable.
- * @param {DataType} dataType - The data type of the variable.
- */
-function _addVariable(namespace, parentNode, browseName, dataType) {
-    namespace.addVariable({
-        componentOf: parentNode,
-        browseName: browseName,
-        dataType: dataType,
-        value: {
-            get: () => {
-                return new Variant({
-                    dataType: dataType,
-                    //arrayType: VariantArrayType.Scalar,
-                    value: _getDefaultValue(dataType)
-                });
-            },
-            set: () => {
-                return StatusCodes.Good;
-            }
-        }
-    });
-}
-
-/**
  * 
  * @param {DataType} dataType - The data type of the variable.
  */
@@ -355,6 +317,15 @@ function _getDefaultValue(dataType) {
     return defaultValue;
 }
 
+/**
+ * Generates a random build number.
+ *
+ * @returns {string} The generated build number.
+ */
+function _generateRandomBuildNumber() {
+    return Math.floor(Math.random() * 10000).toString();
+}
+
 //#endregion
 
 //#region export
@@ -369,8 +340,8 @@ module.exports = {
     IsValidNodeId,
     CreateOpcUaServer,
     CloseServer,
-    InitializeServer,
     GetServer,
+    AddVariable,
     eventEmitter
 }
 

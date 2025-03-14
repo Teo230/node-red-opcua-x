@@ -60,6 +60,34 @@
   });
 </script>
 
+<script type="text/html" data-help-name="opcua-client">
+  <p>This node allows you to connect to an OPC UA server and interact with it.</p>
+  <h3>Properties</h3>
+  <ul>
+    <li><b>Name</b>: The name of the node instance.</li>
+    <li><b>Host</b>: The URL of the OPC UA server (e.g., opc.tcp://localhost:4840/).</li>
+    <li><b>Security Policy</b>: The security policy to use for the connection. Options are:
+      <ul>
+        <li>None</li>
+        <li>Basic256</li>
+        <li>Basic256Sha256</li>
+      </ul>
+    </li>
+    <li><b>Message Security Mode</b>: The message security mode to use. Options are:
+      <ul>
+        <li>None</li>
+        <li>Sign</li>
+        <li>Sign&Encrypt</li>
+      </ul>
+    </li>
+    <li><b>Anonymous</b>: Whether to connect anonymously. If checked, username and password fields are disabled.</li>
+    <li><b>Username</b>: The username for authentication (if not connecting anonymously).</li>
+    <li><b>Password</b>: The password for authentication (if not connecting anonymously).</li>
+  </ul>
+  <h3>Usage</h3>
+  <p>To use this node, drag it into your flow and configure the properties as needed. The node will connect to the specified OPC UA server and allow you to interact with it based on the configured settings.</p>
+</script>
+
 <script type="text/html" data-template-name="opcua-client">
   <div class="form-row">
       <label for="node-input-name"></i> Name</label>

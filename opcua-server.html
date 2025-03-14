@@ -3,22 +3,34 @@
         category: 'opcuax',
         color: '#a6bbcf',
         defaults: {
-            name: {value:""},
-            port: {value: 4334, required: true},
-            endpoint:  {value: "localhost", required: true},
+            name: { value: "" },
+            port: { value: 4840, required: true },
+            resourcePath: { value: "/UA/", required: true },
         },
         inputs: 1,
         outputs: 0,
         icon: "opcua-logo.png",
-        paletteLabel:  "opcuax-server",
+        paletteLabel: "opcuax-server",
         label: function () {
             return this.name || "opcuax-server";
         }
     });
 </script>
 
-<script type="text/html" data-help-name="opcua-server"></script>
+<script type="text/html" data-help-name="opcua-server">
     <p>This node allows you to configure an OPC UA server using the node-opcua library.</p>
+    <h4>Configuration</h4>
+    <ul>
+        <li><b>Name</b>: The name of the OPC UA server node.</li>
+        <li><b>Port</b>: The port on which the OPC UA server will listen. Default is 4840.</li>
+        <li><b>Resource Path</b>: The resource path for the OPC UA server. Default is "/UA/".</li>
+    </ul>
+    <h4>Inputs</h4>
+    <p>This node accepts one input which can be used to trigger the server operations.</p>
+    <h4>Outputs</h4>
+    <p>This node does not produce any outputs.</p>
+    <h4>Usage</h4>
+    <p>Drag and drop the OPC UA server node into your flow. Configure the name, port, and resource path as needed. Connect the input to trigger the server operations.</p>
 </script>
 <script type="text/html" data-template-name="opcua-server">
     <div class="form-row">
@@ -30,7 +42,7 @@
         <input type="text" id="node-input-port" placeholder="Port">
     </div>
     <div class="form-row">
-        <label for="node-input-endpoint"><i class="icon-tag"></i> Endpoint</label>
-        <input type="text" id="node-input-endpoint" placeholder="Endpoint">
+        <label for="node-input-resourcePath"><i class="icon-tag"></i> Resource Path</label>
+        <input type="text" id="node-input-resourcePath" placeholder="resourcePath">
     </div>
 </script>
