@@ -4,7 +4,6 @@ module.exports = function (RED) {
     const {
         GetClient,
         IsValidNodeId,
-        eventEmitter
     } = require('./core');
     const {
         ClientMonitoredItem,
@@ -41,6 +40,12 @@ module.exports = function (RED) {
 
             if (!node.nodeId) {
                 node.error("NodeId not defined");
+                return;
+            }
+
+            const isValid = IsValidNodeId(node.nodeId);
+            if (!isValid) {
+                node.error(node.nodeId + " is not a valid NodeId");
                 return;
             }
 

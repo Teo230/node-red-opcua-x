@@ -3,6 +3,7 @@
     category: "opcuax",
     color: "#a6bbcf",
     defaults: {
+      name: { value: "" },
       nodeId: { value: "" },
       samplingInterval: { value: 100 },
     },
@@ -17,6 +18,10 @@
 </script>
 
 <script type="text/html" data-template-name="opcua-subscription">
+  <div class="form-row">
+    <label for="node-input-name"></i> Name</label>
+    <input type="text" id="node-input-name" placeholder="Name">
+  </div>
   <div class="form-row">
     <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
     <input

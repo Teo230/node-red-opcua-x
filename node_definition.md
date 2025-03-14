@@ -64,7 +64,7 @@
   "opcuax_client_id": "", //Unique client identifier
   "opcuax_read": {
     "nodeId": "", //Unique node identifier
-    "result": {} //Browse result
+    "result": {} //Read result
   }
 }
 ```
@@ -92,7 +92,35 @@
   "opcuax_client_id": "", //Unique client identifier
   "opcuax_subscribe": {
     "nodeId": "", //Unique node identifier
-    "result": {} //Browse result
+    "result": {} //Subscribe result
+  }
+}
+```
+
+# write
+
+## Input
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier (Mandatory)
+  "opcuax_write": {
+    "nodeId": "", //Unique node identifier (Optional)
+    "value": "" //The value to send
+  }
+}
+```
+
+## Output
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier
+  "opcuax_write": {
+    "nodeId": "", //Unique node identifier
+    "statusCode": 0 //Write StatusCode
   }
 }
 ```

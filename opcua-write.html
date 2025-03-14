@@ -3,21 +3,55 @@
         category: 'opcuax',
         color: '#a6bbcf',
         defaults: {
-            nodeid: { required: true },
+            name: { value: "" },
+            nodeId: { value: "" },
+            value: { value: "" }
         },
         inputs: 1,
         outputs: 1,
         icon: "opcua-logo.png",
-        paletteLabel:  "write",
+        paletteLabel: "write",
         label: function () {
             return this.name || "write";
+        },
+        oneditprepare: function () {
+            $("#node-input-value").typedInput({
+                type: "str",
+                types: ["str", "num", "bool", "json"],
+                typeField: "#node-input-value-type"
+            })
         }
     });
 </script>
 
+<script type="text/html" data-help-name="opcua-write">
+    <p>The write node allows you to write a value to a specified OPC UA node.</p>
+    <h4>Properties</h4>
+    <ul>
+        <li><b>Name</b>: The name of the node.</li>
+        <li><b>NodeId</b>: The NodeId of the OPC UA node to write to. This should be in the format <code>ns=*;i=*</code> or <code>ns=*;s=*</code>.</li>
+        <li><b>Value</b>: The value to write to the OPC UA node. This can be a string, number, boolean, or JSON object.</li>
+    </ul>
+    <h4>Inputs</h4>
+    <p>This node accepts one input which is the value to be written to the OPC UA node.</p>
+    <h4>Outputs</h4>
+    <p>This node provides one output which is the result of the write operation.</p>
+    <h4>Usage</h4>
+    <p>To use this node, drag it into your flow, configure the properties, and connect it to other nodes as needed. When a message is received, the node will write the specified value to the OPC UA node and output the result.</p>
+</script>
+
 <script type="text/html" data-template-name="opcua-write">
     <div class="form-row">
-        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
-        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
+        <label for="node-input-name"></i> Name</label>
+        <input type="text" id="node-input-name" placeholder="Name">
+    </div>
+    <div class="form-row">
+        <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
+        <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
+    </div>
+    <div class="form-row">
+        <label for="node-input-value"><i class="fa fa-pencil"></i> Value</label>
+        <input type="text" id="node-input-value" placeholder="Value">
+        <input type="hidden" id="node-input-value-type">
     </div>
 </script>

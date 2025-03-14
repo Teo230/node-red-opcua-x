@@ -2,62 +2,90 @@
 module.exports = function (RED) {
 
     const {
-        GetClient
+        GetClient,
+        IsValidNodeId
     } = require('./core');
     const {
         AttributeIds,
         DataValue,
-        Variant
+        Variant,
     } = require('node-opcua');
 
     function opcUaWriteNode(args) {
-
         RED.nodes.createNode(this, args);
-        const opcuaclientnode = RED.nodes.getNode(args.client);
-        const existingClient = GetClient(opcuaclientnode.connectionId);
 
         var node = this;
 
         node.name = args.name;
-        node.nodeId = args.nodeid;
+        node.nodeId = args.nodeId;
 
         node.on('input', function (msg) {
 
-            if(existingClient.clientState == "reconnecting") return;
-            if(existingClient.clientState == "disconnected") return;
+            node.opcuax_client_id = msg.opcuax_client_id;
+            const client = GetClient(node.opcuax_client_id);
 
-            if (existingClient.session == undefined) {
+            if (!client) {
+                node.error("OPC UA Client not defined");
+                return;
+            }
+
+            const session = client.session;
+            if (session == undefined) {
                 node.error("Session not found");
                 return;
             }
-            
+
             // Override nodeId from incoming node if not defined on read node
-            if (!args.nodeId && msg.nodeId) node.nodeId = msg.nodeId;
-            
+            node.nodeId = msg.opcuax_write?.nodeId;
+            if (!node.nodeId) node.nodeId = args.nodeId;
+
+            if (!node.nodeId) {
+                node.error("NodeId not defined");
+                return;
+            }
+
             const isValid = IsValidNodeId(node.nodeId);
-            if(!isValid){
+            if (!isValid) {
                 node.error(node.nodeId + " is not a valid NodeId");
                 return;
             }
 
-            const value = msg.payload.value;
+            node.value = msg.opcuax_write?.value;
+            if (!node.value) node.value = args.value;
 
-            write(value);
+            write(session);
         });
 
-        async function write(requestValue) {
-            const dataType = await existingClient.session.getBuiltInDataType(node.nodeId);
-            const resultStatus = await existingClient.session.write({
+        async function write(session) {
+            const dataType = await session.getBuiltInDataType(node.nodeId);
+            const statusCode = await session.write({
                 nodeId: node.nodeId,
                 attributeId: AttributeIds.Value,
                 value: new DataValue({
                     value: new Variant({
                         dataType: dataType,
-                        value: requestValue
+                        value: node.value
                     })
                 })
             });
-            node.debug(resultStatus.description);
+
+            if (!statusCode.isGood()) {
+                node.error("Something went wrong on write value on NodeId " + node.nodeId);
+                return;
+            }
+
+            sendResult(statusCode);
+        }
+
+        function sendResult(statusCode) {
+            node.send({
+                payload: node.payload,
+                opcuax_client_id: node.opcuax_client_id,
+                opcuax_write: {
+                    nodeId: node.nodeId,
+                    statusCode: statusCode
+                }
+            });
         }
     }
 
