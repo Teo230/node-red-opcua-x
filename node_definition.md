@@ -124,3 +124,31 @@
   }
 }
 ```
+
+# call
+
+## Input
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier (Mandatory)
+  "opcuax_call": {
+    "parentNodeId": "", //Unique parent node identifier (Optional)
+    "nodeId": "", //Unique node identifier (Optional)
+  }
+}
+```
+
+## Output
+
+```json
+{
+  "payload": {},
+  "opcuax_client_id": "", //Unique client identifier
+  "opcuax_call": {
+    "nodeId": "", //Unique node identifier
+    "statusCode": 0 //Write StatusCode
+  }
+}
+```

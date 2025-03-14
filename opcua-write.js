@@ -70,7 +70,7 @@ module.exports = function (RED) {
             });
 
             if (!statusCode.isGood()) {
-                node.error("Something went wrong on write value on NodeId " + node.nodeId);
+                node.error("Something went wrong on write node with NodeId " + node.nodeId + ": " + statusCode._description);
                 return;
             }
 

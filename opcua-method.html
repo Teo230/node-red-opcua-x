@@ -3,10 +3,11 @@
         category: 'opcuax',
         color: '#a6bbcf',
         defaults: {
-            nodeid: { required: false, required: true },
             name: { value: "" },
-            inputargs: { value: [], required: false },
-            outputargs: { value: [], required: false },
+            parentNodeId: { value: "" },
+            nodeId: { value: "" },
+            // inputargs: { value: [], required: false },
+            // outputargs: { value: [], required: false },
         },
         inputs: 1,
         outputs: 1,
@@ -24,10 +25,14 @@
         <input type="text" id="node-input-name" placeholder="Name">
     </div>
     <div class="form-row">
-        <label for="node-input-nodeid"><i class="fa fa-link"></i> NodeId</label>
-        <input type="text" id="node-input-nodeid" placeholder="ns=*;i=*, ns=*;s=*">
+        <label for="node-input-parentNodeId"><i class="fa fa-link"></i> Parent NodeId</label>
+        <input type="text" id="node-input-parentNodeId" placeholder="ns=*;i=*, ns=*;s=*">
     </div>
-    <h4>Input Arguments</h4>
+    <div class="form-row">
+        <label for="node-input-nodeId"><i class="fa fa-link"></i> NodeId</label>
+        <input type="text" id="node-input-nodeId" placeholder="ns=*;i=*, ns=*;s=*">
+    </div>
+    <!-- <h4>Input Arguments</h4>
     <div class="form-row">
         <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
             <ol id="node-input-property-container"></ol>
@@ -39,5 +44,5 @@
         <div class="form-row node-input-property-container-row" style="min-height: 120px; min-width: 450px; border: 1px;">
             <ol id="node-input-property-container"></ol>
         </div>
-    </div>
+    </div> -->
 </script>

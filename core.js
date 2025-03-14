@@ -12,14 +12,13 @@ const {
     UAVariable
 } = require('node-opcua')
 
-/**@type {OPCUAClient[]} */
-let opcClients = [];
-
-/** @type {OPCUAServer} */
-let opcServer = null;
-
 /**@type {EventEmitter} */
 const eventEmitter = new EventEmitter();
+
+//#region Client extensions
+
+/**@type {OPCUAClient[]} */
+let opcClients = [];
 
 function CreateOpcUaClient(connectionId, name, authOption) {
 
@@ -115,14 +114,13 @@ function CreateSubscription(session) {
     return subscription;
 }
 
-function IsValidNodeId(nodeId) {
-    const regex = /^(ns=\d+;)?(i=\d+|s=[\w\-]+|g=[\da-fA-F\-]+|b=[\da-fA-F]*)$/i;
-    return regex.test(nodeId);
-}
-
 function GetClient(connectionId) {
     return opcClients[connectionId];
 }
+
+//#endregion
+
+//#region Server extensions
 
 /**
  * Creates an OPC UA Server instance.
@@ -143,12 +141,6 @@ function CreateOpcUaServer(resourcePath, port) {
 
     return opcServer;
 }
-
-async function CloseServer() {
-    await opcServer.shutdown(1000);
-}
-
-function GetServer() { return opcServer; }
 
 /**
  * Adds a variable to the OPC UA namespace.
@@ -172,6 +164,52 @@ function AddVariable(namespace, parentNode, browseName, dataType) {
         })
     });
 }
+
+/**
+ * Adds a method to the OPC UA namespace.
+ *
+ * @param {object} namespace - The namespace object to which the method will be added.
+ * @param {UAObject} parentNode - The parent node under which the method will be added.
+ * @param {string} browseName - The browse name of the method.
+ * @param {function} methodFunction - The function to be executed when the method is called.
+ * @returns {UAMethod} - The generated OPC Method.
+ */
+function AddMethod(namespace, parentNode, browseName, methodFunction) {
+    const method = namespace.addMethod(parentNode, {
+        browseName: browseName,
+        inputArguments: [],
+        outputArguments: [
+            {
+                name: "Boolean Value",
+                description: { text: "Generic method" },
+                dataType: DataType.Boolean,
+                valueRank: 1
+            }
+        ]
+    });
+
+    method.bindMethod((inputArguments, context, callback) => {
+        const result = methodFunction(inputArguments, context);
+        const callMethodResult = {
+            statusCode: StatusCodes.Good,
+            outputArguments: [new Variant({ dataType: DataType.Boolean, value: true })]
+        };
+        callback(null, callMethodResult);
+    });
+
+    return method;
+}
+
+//#endregion
+
+//#region Generic extensions
+
+function IsValidNodeId(nodeId) {
+    const regex = /^(ns=\d+;)?(i=\d+|s=[\w\-]+|g=[\da-fA-F\-]+|b=[\da-fA-F]*)$/i;
+    return regex.test(nodeId);
+}
+
+//#endregion
 
 //#region private
 
@@ -339,9 +377,8 @@ module.exports = {
     GetClient,
     IsValidNodeId,
     CreateOpcUaServer,
-    CloseServer,
-    GetServer,
     AddVariable,
+    AddMethod,
     eventEmitter
 }
 

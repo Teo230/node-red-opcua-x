@@ -6,8 +6,7 @@ module.exports = function (RED) {
 
     const {
         CreateOpcUaServer,
-        CloseServer,
-        GetServer,
+        AddMethod,
         AddVariable
     } = require("./core");
 
@@ -17,6 +16,7 @@ module.exports = function (RED) {
         RED.nodes.createNode(this, args);
 
         let node = this;
+        let server = null;
 
         if (args.resourcePath === undefined) return;
         if (args.port === undefined) return;
@@ -24,8 +24,9 @@ module.exports = function (RED) {
         node.resourcePath = args.resourcePath;
         node.port = args.port;
 
-        startServer();
-
+        node.on('input', function (msg) {
+            startServer();
+        });
         node.on('close', onNodeClosed);
         node.on('error', onNodeError);
 
@@ -33,7 +34,7 @@ module.exports = function (RED) {
 
         async function startServer() {
 
-            const server = CreateOpcUaServer(node.resourcePath, node.port);
+            server = CreateOpcUaServer(node.resourcePath, node.port);
             await server.initialize();
 
             const addressSpace = server.engine.addressSpace;
@@ -83,17 +84,27 @@ module.exports = function (RED) {
             AddVariable(namespace, scalarFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
             AddVariable(namespace, scalarFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
             AddVariable(namespace, scalarFolder, DataType[DataType.NodeId], DataType.NodeId);
+
+            const methodFolder = namespace.addObject({
+                organizedBy: parentNode,
+                browseName: "Method",
+                typeDefinition: "FolderType",
+            })
+
+            AddMethod(namespace, methodFolder, "SendBoolean", () => {
+                console.log("Send boolean method called");
+            });
         }
 
         async function onNodeClosed(done) {
-            await CloseServer();
             node.status({ text: "" });
+            await server?.shutdown(1000);
             done();
         }
 
         async function onNodeError() {
             node.status({ text: "" });
-            await CloseServer();
+            await server?.shutdown(1000);
         }
 
         //#endregion

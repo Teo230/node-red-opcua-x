@@ -28,7 +28,8 @@ module.exports = function (RED) {
                 return;
             }
 
-            if (client.session == undefined) {
+            const session = client.session;
+            if (session == undefined) {
                 node.error("Session not found");
                 return;
             }
@@ -48,18 +49,19 @@ module.exports = function (RED) {
                 return;
             }
 
-            readNode(client);
+            readNode(session);
         });
 
-        async function readNode(client) {
+        async function readNode(session) {
             const nodeToRead = {
                 nodeId: node.nodeId,
                 attributeId: AttributeIds.Value
             };
-            const dataValue = await client.session.read(nodeToRead);
+            const dataValue = await session.read(nodeToRead);
+            const statusCode = dataValue.statusCode;
 
-            if (!dataValue.statusCode.isGood()) {
-                node.error("Something went wrong on read NodeId " + node.nodeId);
+            if (!statusCode.isGood()) {
+                node.error("Something went wrong on read node with NodeId " + node.nodeId + ": " + statusCode._description);
                 return;
             }
 
