@@ -6,7 +6,7 @@
             name: { value: "" },
             parentNodeId: { value: "" },
             nodeId: { value: "" },
-            inputArguments: { value: [] }
+            inputArguments: { value: [{ dataType: "str", value: "" }] },
         },
         inputs: 1,
         outputs: 1,
@@ -16,42 +16,40 @@
             return this.name || "call";
         },
         oneditprepare: function () {
+            let node = this;
+            console.log("Node: ", this.inputArguments);
+
             $("#node-input-inputArguments").css('height', 'auto').editableList({
                 sortable: true,
                 removable: true,
                 addButton: "Add argument",
                 addItem: function (container, i, data) {
+
+                    if (!data || !data.dataType) {
+                        data = { dataType: "str", value: "" };
+                    }
+
                     var row = $('<div style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
 
-                    // Value Input and Type Selection using TypedInput
-                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;">')
+                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-value' + i + '">')
                         .appendTo(row)
-                        .val(data ? data.value : "")
+                        .val(data.value)
                         .attr('placeholder', 'Value');
 
                     var position = $('<span style="margin-left: 5px;"> → <span class="node-input-rule-index">' + i + '</span> </span>').appendTo(row);
 
-                    // Hidden field to store the selected type (if needed for later use)
-                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
-
+                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type' + i + '">').appendTo(row);
                     valueInput.typedInput({
-                        type: data && data.dataType ? data.dataType : "str", // Initialize with existing type or default to string
+                        type: data.dataType,
                         types: ["str", "num", "bool", "json"],
                         typeField: typeField,
                         onChange: function (type, value) {
                             data.dataType = type;
                             data.value = value;
+                            $(container).find('.node-input-value' + i).attr('value', value);
+                            $(container).find('.node-input-value-type' + i).attr('value', type);
                         }
                     });
-
-                    // Initialize data if it doesn't exist
-                    if (!data) {
-                        data = { dataType: "str", value: "" };
-                    }
-
-                    // Load existing input arguments
-                    var args = this.inputArguments || [];
-                    container.editableList('addItems', args);
                 },
                 removeItem: function (opt) {
                     var rules = $('#node-input-inputArguments').editableList('items');
@@ -66,13 +64,30 @@
                     });
                 }
             });
+
+            // Check if node.inputArguments exists before using forEach
+            if (node.inputArguments && Array.isArray(node.inputArguments) && node.inputArguments.length > 0) {
+                node.inputArguments.forEach(function (arg) {
+                    $("#node-input-inputArguments").editableList('addItem', arg);
+                });
+            }
         },
-        oneditresize: function () {
-            var dialogForm = $('#dialog-form');
-            var rowName = $('.form-row-name', dialogForm);
-            var rowLabel = $('.form-row-label', dialogForm);
-            var height = dialogForm.height() - rowName.height() - rowLabel.height() - 30;
-            $('#node-input-inputArguments').editableList('height', height);
+        oneditsave: function () {
+            var inputArgs = $("#node-input-inputArguments").editableList('items');
+            let node = this;
+            node.inputArguments = [];
+            inputArgs.each(function (i) {
+                var valueNode = $(this).find('.node-input-value' + i);
+                var value = valueNode.attr('value');
+
+                var dataTypeNode = $(this).find('.node-input-value-type' + i);
+                var dataType = dataTypeNode.attr('value');
+
+                node.inputArguments.push({
+                    value: value,
+                    dataType: dataType
+                });
+            });
         }
     });
 </script>
@@ -94,7 +109,7 @@
     <h4>Input Arguments</h4>
     <div class="form-row node-input-inputArguments-row">
         <ol id="node-input-inputArguments"></ol>
-    </div>  
+    </div>
 
     <h4>Output Arguments</h4>
     <div class="form-row">

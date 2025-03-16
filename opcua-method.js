@@ -10,6 +10,7 @@ module.exports = function (RED) {
         var node = this;
 
         node.name = args.name;
+        node.inputArguments = args.inputArguments || [];
 
         // Read Input Arg node
         node.on('input', function (msg) {
@@ -54,6 +55,8 @@ module.exports = function (RED) {
                 node.error(node.parentNodeId + " is not a valid NodeId");
                 return;
             }
+
+            node.inputArguments = args.inputArguments;
 
             call(session);
         });
