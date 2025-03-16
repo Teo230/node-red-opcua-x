@@ -23,7 +23,8 @@ module.exports = function (RED) {
                 return;
             }
 
-            if (client.session == undefined) {
+            const session = client.session;
+            if (session == undefined) {
                 node.error("Session not found");
                 return;
             }
@@ -43,11 +44,11 @@ module.exports = function (RED) {
                 return;
             }
 
-            browseNode(client);
+            browseNode(session);
         });
 
-        async function browseNode(client) {
-            const browseResult = await client.session.browse(node.nodeId);
+        async function browseNode(session) {
+            const browseResult = await session.browse(node.nodeId);
 
             items = [browseResult.references.length];
             for (const index in browseResult.references) {

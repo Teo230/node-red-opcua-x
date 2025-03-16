@@ -1,8 +1,15 @@
+const { SessionContext, NodeId } = require('node-opcua');
+
 module.exports = function (RED) {
     const {
         GetClient,
         IsValidNodeId
     } = require('./core');
+    const {
+        ClientSession,
+        ReferenceTypeIds,
+        BrowseDirection
+    } = require('node-opcua')
 
     function opcUaMethodNode(args) {
         RED.nodes.createNode(this, args);
@@ -44,41 +51,53 @@ module.exports = function (RED) {
                 return;
             }
 
-            node.parentNodeId = msg.opcuax_call?.parentNodeId;
-            if(!node.parentNodeId) node.parentNodeId = args.parentNodeId;
-            if (!node.parentNodeId) {
-                node.error("Parent NodeId not defined");
-                return;
-            }
-
-            const isValidParentNodeId = IsValidNodeId(node.parentNodeId);
-            if (!isValidParentNodeId) {
-                node.error(node.parentNodeId + " is not a valid NodeId");
-                return;
-            }
-
             call(session);
         });
 
+        /**
+         * 
+         * @param {ClientSession} session 
+         * @returns {NodeId | undefined}
+         */
+        async function getParentNodeId(session) {
+            const parentNode = await session.browse({
+                nodeId: node.nodeId,
+                referenceTypeId: ReferenceTypeIds.HasComponent,
+                browseDirection: BrowseDirection.Inverse
+            });
+            
+            if (parentNode.references.length > 0) {
+                return parentNode.references[0].nodeId;
+            } else {
+                node.error("Parent NodeId not found by browsing 'ComponentOf' reference");
+                return undefined;
+            }
+        }
+
+        //TODO - Handle Input/output arguments
         async function call(session) {
+
+            const parentNodeId = await getParentNodeId(session);
+
             const methodToCall = {
-                objectId: node.parentNodeId,
+                objectId: parentNodeId,
                 methodId: node.nodeId,
                 inputArguments: []
             };
 
             const result = await session.call(methodToCall);
-            const outArgs = result.outputArgument;
             const statusCode = result.statusCode;
             if (!statusCode.isGood()) {
                 node.error("Something went wrong on call node with NodeId " + node.nodeId + ": " + statusCode._description);
                 return;
             }
 
+            const outArgs = result.outputArguments;
+
             sendResult(statusCode);
         }
 
-        function sendResult(statusCode){
+        function sendResult(statusCode) {
             node.send({
                 payload: node.payload,
                 opcuax_client_id: node.opcuax_client_id,
