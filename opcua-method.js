@@ -11,6 +11,7 @@ module.exports = function (RED) {
 
         node.name = args.name;
         node.inputArguments = args.inputArguments || [];
+        node.outputArguments = args.outputArguments || [];
 
         // Read Input Arg node
         node.on('input', function (msg) {
@@ -56,8 +57,6 @@ module.exports = function (RED) {
                 return;
             }
 
-            node.inputArguments = args.inputArguments;
-
             call(session);
         });
 
@@ -69,6 +68,7 @@ module.exports = function (RED) {
             };
 
             const result = await session.call(methodToCall);
+            const outArgs = result.outputArgument;
             const statusCode = result.statusCode;
             if (!statusCode.isGood()) {
                 node.error("Something went wrong on call node with NodeId " + node.nodeId + ": " + statusCode._description);

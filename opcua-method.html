@@ -6,7 +6,8 @@
             name: { value: "" },
             parentNodeId: { value: "" },
             nodeId: { value: "" },
-            inputArguments: { value: [{ dataType: "str", value: "" }] },
+            inputArguments: { value: undefined },
+            outputArguments: { value: undefined }
         },
         inputs: 1,
         outputs: 1,
@@ -17,77 +18,167 @@
         },
         oneditprepare: function () {
             let node = this;
-            console.log("Node: ", this.inputArguments);
 
-            $("#node-input-inputArguments").css('height', 'auto').editableList({
+            if (!node.inputArguments || node.inputArguments == undefined) {
+                node.inputArguments = [{ dataType: "str", value: "" }];
+            }
+
+            if (!node.outputArguments ||node.outputArguments == undefined) {
+                node.outputArguments = [{ dataType: "str", value: "" }];
+            }
+
+            //#region Input arguments table
+
+            var inputArgumentsContainer = $("#node-input-inputArguments-container");
+            inputArgumentsContainer.editableList({
                 sortable: true,
                 removable: true,
+                scrollOnAdd: true,
+                height: "auto",
                 addButton: "Add argument",
-                addItem: function (container, i, data) {
+                addItem: function (container, i, argument) {
 
-                    if (!data || !data.dataType) {
-                        data = { dataType: "str", value: "" };
-                    }
+                    var row = $('<div id="arg' + i + '" style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
 
-                    var row = $('<div style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
-
-                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-value' + i + '">')
+                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-value">')
                         .appendTo(row)
-                        .val(data.value)
+                        .val(argument.value)
                         .attr('placeholder', 'Value');
 
-                    var position = $('<span style="margin-left: 5px;"> → <span class="node-input-rule-index">' + i + '</span> </span>').appendTo(row);
+                    var position = $('<span style="margin-left: 5px;"> → <span class="node-input-inputArg-index">' + i + '</span> </span>').appendTo(row);
 
-                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type' + i + '">').appendTo(row);
+                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
                     valueInput.typedInput({
-                        type: data.dataType,
+                        type: argument.dataType,
                         types: ["str", "num", "bool", "json"],
                         typeField: typeField,
-                        onChange: function (type, value) {
-                            data.dataType = type;
-                            data.value = value;
-                            $(container).find('.node-input-value' + i).attr('value', value);
-                            $(container).find('.node-input-value-type' + i).attr('value', type);
+                        onChange: function (dataType, value) {
+                            argument.dataType = dataType;
+                            argument.value = value;
+                            $(container).find('#arg' + i).find('.node-input-value').attr('value', value);
+                            $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
                         }
                     });
                 },
                 removeItem: function (opt) {
-                    var rules = $('#node-input-inputArguments').editableList('items');
-                    rules.each(function (i) {
-                        $(this).find('.node-input-rule-index').html(i);
+                    var inputArgs = inputArgumentsContainer.editableList('items');
+                    inputArgs.each(function (i) {
+                        $(this).find('.node-input-inputArg-index').html(i);
                     });
                 },
                 sortItems: function () {
-                    var rules = $('#node-input-inputArguments').editableList('items');
-                    rules.each(function (i) {
-                        $(this).find('.node-input-rule-index').html(i);
+                    var inputArgs = inputArgumentsContainer.editableList('items');
+                    inputArgs.each(function (i) {
+                        var divIndex = $(this).find('.node-input-inputArg-index');
+                        divIndex.html(i);
+                        var row = divIndex.parent().parent();
+                        row.attr('id', 'arg' + i);
                     });
                 }
             });
 
-            // Check if node.inputArguments exists before using forEach
-            if (node.inputArguments && Array.isArray(node.inputArguments) && node.inputArguments.length > 0) {
-                node.inputArguments.forEach(function (arg) {
-                    $("#node-input-inputArguments").editableList('addItem', arg);
-                });
-            }
+            //#endregion
+
+            //#region Output arguments table
+
+            var outputArgumentsContainer = $("#node-input-outputArguments-container");
+            outputArgumentsContainer.editableList({
+                sortable: true,
+                removable: true,
+                scrollOnAdd: true,
+                height: "auto",
+                addButton: "Add argument",
+                addItem: function (container, i, argument) {
+
+                    var row = $('<div id="arg' + i + '" style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
+
+                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-value">')
+                        .appendTo(row)
+                        .val(argument.value)
+                        .attr('placeholder', 'Value');
+
+                    var position = $('<span style="margin-left: 5px;"> → <span class="node-input-outArg-index">' + i + '</span> </span>').appendTo(row);
+
+                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
+                    valueInput.typedInput({
+                        type: argument.dataType,
+                        types: ["str", "num", "bool", "json"],
+                        typeField: typeField,
+                        onChange: function (dataType, value) {
+                            argument.dataType = dataType;
+                            argument.value = value;
+                            $(container).find('#arg' + i).find('.node-input-value').attr('value', value);
+                            $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
+                        }
+                    });
+                },
+                removeItem: function (opt) {
+                    var outArgs = outputArgumentsContainer.editableList('items');
+                    outArgs.each(function (i) {
+                        $(this).find('.node-input-outArg-index').html(i);
+                    });
+                },
+                sortItems: function () {
+                    var outArgs = outputArgumentsContainer.editableList('items');
+                    outArgs.each(function (i) {
+                        var divIndex = $(this).find('.node-input-outArg-index');
+                        divIndex.html(i);
+                        var row = divIndex.parent().parent();
+                        row.attr('id', 'arg' + i);
+                    });
+                }
+            });
+
+            //#endregion
+
+            // Fill data
+            (Array.isArray(node.inputArguments) ? node.inputArguments : []).forEach(function (arg) {
+                inputArgumentsContainer.editableList('addItem', arg);
+            });
+
+            (Array.isArray(node.outputArguments) ? node.outputArguments : []).forEach(function (arg) {
+                outputArgumentsContainer.editableList('addItem', arg);
+            });
         },
         oneditsave: function () {
-            var inputArgs = $("#node-input-inputArguments").editableList('items');
-            let node = this;
-            node.inputArguments = [];
-            inputArgs.each(function (i) {
-                var valueNode = $(this).find('.node-input-value' + i);
-                var value = valueNode.attr('value');
 
-                var dataTypeNode = $(this).find('.node-input-value-type' + i);
-                var dataType = dataTypeNode.attr('value');
+            let node = this;
+
+            //#region Input arguments
+
+            var inputArgContainer = $("#node-input-inputArguments-container");
+            var inputArgs = inputArgContainer.editableList('items');
+            node.inputArguments = [];
+            inputArgs.each(function (index) {
+                var row = inputArgContainer.find('#arg' + index);
+                var value = row.find('.node-input-value').attr('value');
+                var dataType = row.find('.node-input-value-type').attr('value');
 
                 node.inputArguments.push({
                     value: value,
                     dataType: dataType
                 });
             });
+
+            //#endregion
+
+            //#region Output arguments
+
+            var outArgContainer = $("#node-input-outputArguments-container");
+            var outputArgs = outArgContainer.editableList('items');
+            node.outputArguments = [];
+            outputArgs.each(function (index) {
+                var row = outArgContainer.find('#arg' + index);
+                var value = row.find('.node-input-value').attr('value');
+                var dataType = row.find('.node-input-value-type').attr('value');
+
+                node.outputArguments.push({
+                    value: value,
+                    dataType: dataType
+                });
+            });
+
+            //#endregion
         }
     });
 </script>
@@ -107,14 +198,16 @@
     </div>
 
     <h4>Input Arguments</h4>
-    <div class="form-row node-input-inputArguments-row">
-        <ol id="node-input-inputArguments"></ol>
+    <div class="form-row">
+        <div class="form-row node-input-inputArguments-container-row">
+            <ol id="node-input-inputArguments-container"></ol>
+        </div>
     </div>
 
     <h4>Output Arguments</h4>
     <div class="form-row">
-        <div class="form-row node-input-property-container-row">
-            <ol id="node-input-property-container"></ol>
+        <div class="form-row node-input-outputArguments-container-row">
+            <ol id="node-input-outputArguments-container"></ol>
         </div>
     </div>
 </script>
