@@ -59,6 +59,8 @@
                             $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
                         }
                     });
+
+                    var rowContainer = row.find('.red-ui-typedInput-container').css('flex-grow', 1);
                 },
                 removeItem: function (opt) {
                     var inputArgs = inputArgumentsContainer.editableList('items');
@@ -111,6 +113,8 @@
                             $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
                         }
                     });
+
+                    var rowContainer = row.find('.red-ui-typedInput-container').css('flex-grow', 1);
                 },
                 removeItem: function (opt) {
                     var outArgs = outputArgumentsContainer.editableList('items');
