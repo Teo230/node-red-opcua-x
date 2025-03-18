@@ -49,7 +49,7 @@
                     var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
                     valueInput.typedInput({
                         type: argument.dataType,
-                        types: ["str", "num", "bool", "json"],
+                        types: ["str", "num", "bool"],
                         typeField: typeField,
                         onChange: function (dataType, value) {
                             argument.dataType = dataType;
@@ -103,7 +103,7 @@
                     var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
                     valueInput.typedInput({
                         type: argument.dataType,
-                        types: ["str", "num", "bool", "json"],
+                        types: ["str", "num", "bool"],
                         typeField: typeField,
                         onChange: function (dataType, value) {
                             argument.dataType = dataType;

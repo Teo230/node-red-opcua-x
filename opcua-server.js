@@ -91,9 +91,25 @@ module.exports = function (RED) {
                 typeDefinition: "FolderType",
             })
 
-            AddMethod(namespace, methodFolder, "SendBoolean", () => {
-                console.log("Send boolean method called");
-            });
+            AddMethod(namespace, methodFolder, DataType[DataType.Boolean], DataType.Boolean);
+            AddMethod(namespace, methodFolder, DataType[DataType.SByte], DataType.SByte);
+            AddMethod(namespace, methodFolder, DataType[DataType.Byte], DataType.Byte);
+            AddMethod(namespace, methodFolder, DataType[DataType.Int16], DataType.Int16);
+            AddMethod(namespace, methodFolder, DataType[DataType.UInt16], DataType.UInt16);
+            AddMethod(namespace, methodFolder, DataType[DataType.Int32], DataType.Int32);
+            AddMethod(namespace, methodFolder, DataType[DataType.UInt32], DataType.UInt32);
+            AddMethod(namespace, methodFolder, DataType[DataType.Int64], DataType.Int64);
+            AddMethod(namespace, methodFolder, DataType[DataType.UInt64], DataType.UInt64);
+            AddMethod(namespace, methodFolder, DataType[DataType.Float], DataType.Float);
+            AddMethod(namespace, methodFolder, DataType[DataType.Double], DataType.Double);
+            AddMethod(namespace, methodFolder, DataType[DataType.String], DataType.String);
+            AddMethod(namespace, methodFolder, DataType[DataType.DateTime], DataType.DateTime);
+            AddMethod(namespace, methodFolder, DataType[DataType.Guid], DataType.Guid);
+            AddMethod(namespace, methodFolder, DataType[DataType.ByteString], DataType.ByteString);
+            AddMethod(namespace, methodFolder, DataType[DataType.XmlElement], DataType.XmlElement);
+            AddMethod(namespace, methodFolder, DataType[DataType.LocalizedText], DataType.LocalizedText);
+            AddMethod(namespace, methodFolder, DataType[DataType.QualifiedName], DataType.QualifiedName);
+            AddMethod(namespace, methodFolder, DataType[DataType.NodeId], DataType.NodeId);
         }
 
         async function onNodeClosed(done) {

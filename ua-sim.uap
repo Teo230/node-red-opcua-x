@@ -33,7 +33,7 @@
 1\Name=NodeRed-Server
 1\Connected=false
 1\ProjectServerId=1
-1\ServerUrl=opc.tcp://localhost:4334/UA/node-red-x
+1\ServerUrl=opc.tcp://localhost:4840/UA
 1\Server.ApplicationUri=urn:TEO230-DESKTOP:NodeOPCUA-Server
 1\Server.ProductUri=NodeOPCUA-Server
 1\Server.ApplicationNameLocale=en-US

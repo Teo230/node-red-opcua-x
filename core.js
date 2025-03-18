@@ -9,7 +9,8 @@ const {
     DataType,
     AccessLevelFlag,
     UAObject,
-    UAVariable
+    UAVariable,
+    VariantArrayType
 } = require('node-opcua')
 
 /**@type {EventEmitter} */
@@ -171,28 +172,26 @@ function AddVariable(namespace, parentNode, browseName, dataType) {
  * @param {object} namespace - The namespace object to which the method will be added.
  * @param {UAObject} parentNode - The parent node under which the method will be added.
  * @param {string} browseName - The browse name of the method.
- * @param {function} methodFunction - The function to be executed when the method is called.
+ * @param {DataType} dataType - The data type of the input/output argument
  * @returns {UAMethod} - The generated OPC Method.
  */
-function AddMethod(namespace, parentNode, browseName, methodFunction) {
+function AddMethod(namespace, parentNode, browseName, dataType) {
     const method = namespace.addMethod(parentNode, {
         browseName: browseName,
-        inputArguments: [],
+        inputArguments: [
+            { name: "Arg0", dataType: dataType, valueRank: -1 },
+        ],
         outputArguments: [
-            {
-                name: "Boolean Value",
-                description: { text: "Generic method" },
-                dataType: DataType.Boolean,
-                valueRank: 1
-            }
+            { name: "Arg0", dataType: dataType, valueRank: -1 },
         ]
     });
 
     method.bindMethod((inputArguments, context, callback) => {
-        const result = methodFunction(inputArguments, context);
         const callMethodResult = {
             statusCode: StatusCodes.Good,
-            outputArguments: [new Variant({ dataType: DataType.Boolean, value: true })]
+            outputArguments: [
+                new Variant({ dataType: dataType, value: inputArguments[0].value, valueRank: -1, arrayType: VariantArrayType.Scalar }),
+            ]
         };
         callback(null, callMethodResult);
     });

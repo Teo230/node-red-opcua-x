@@ -1,4 +1,4 @@
-const { SessionContext, NodeId } = require('node-opcua');
+const { SessionContext, NodeId, DataType } = require('node-opcua');
 
 module.exports = function (RED) {
     const {
@@ -8,7 +8,8 @@ module.exports = function (RED) {
     const {
         ClientSession,
         ReferenceTypeIds,
-        BrowseDirection
+        BrowseDirection,
+        AttributeIds
     } = require('node-opcua')
 
     function opcUaMethodNode(args) {
@@ -78,11 +79,29 @@ module.exports = function (RED) {
         async function call(session) {
 
             const parentNodeId = await getParentNodeId(session);
+            const methodBrowseData = await session.browse(node.nodeId);
+
+            let castInputArgs = [];
+            const nodeToRead = {
+                nodeId: methodBrowseData.references[0].nodeId,
+                attributeId: AttributeIds.Value
+            };
+            const methodInputArgs = (await session.read(nodeToRead)).value.value;
+            methodInputArgs.forEach(inputArgDef => { 
+                const index = methodInputArgs.indexOf(inputArgDef);
+                const argument = node.inputArguments[index];
+                if (argument) {
+                    argument.dataType = DataType[inputArgDef.dataType.value];
+                    castInputArgs.push({ dataType: argument.dataType, value: argument.value == 'true' ? true : false }); //TODO - To handle for each type
+                } else {
+                    node.error("Input argument " + index + " not found in node input arguments");
+                }
+            });
 
             const methodToCall = {
                 objectId: parentNodeId,
                 methodId: node.nodeId,
-                inputArguments: []
+                inputArguments: castInputArgs
             };
 
             const result = await session.call(methodToCall);
@@ -94,16 +113,17 @@ module.exports = function (RED) {
 
             const outArgs = result.outputArguments;
 
-            sendResult(statusCode);
+            sendResult(statusCode, outArgs);
         }
 
-        function sendResult(statusCode) {
+        function sendResult(statusCode, outArgs) {
             node.send({
                 payload: node.payload,
                 opcuax_client_id: node.opcuax_client_id,
                 opcuax_call: {
                     nodeId: node.nodeId,
-                    statusCode: statusCode
+                    statusCode: statusCode,
+                    outputArguments: outArgs
                 }
             });
         }
