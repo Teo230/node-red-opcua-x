@@ -19,11 +19,11 @@
             let node = this;
 
             if (!node.inputArguments || node.inputArguments == undefined) {
-                node.inputArguments = [{ dataType: "str", value: "" }];
+                node.inputArguments = [{ dataType: 1, value: true }];
             }
 
-            if (!node.outputArguments ||node.outputArguments == undefined) {
-                node.outputArguments = [{ dataType: "str", value: "" }];
+            if (!node.outputArguments || node.outputArguments == undefined) {
+                node.outputArguments = [{ dataType: 1, value: true }];
             }
 
             //#region Input arguments table
@@ -34,30 +34,81 @@
                 removable: true,
                 scrollOnAdd: true,
                 height: "auto",
-                addButton: "Add argument",
+                addButton: "Add",
                 addItem: function (container, i, argument) {
 
-                    var row = $('<div id="arg' + i + '" style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
+                    var row = $('<div id="arg' + i + '" style="overflow: hidden; display: flex; align-items: center;"></div>')
+                        .appendTo(container);
 
-                    var valueInput = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-value">')
-                        .appendTo(row)
-                        .val(argument.value)
-                        .attr('placeholder', 'Value');
+                    var dataTypeField = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" id="node-input-inputArg-value-type">')
+                        .appendTo(row);
+                    dataTypeField.typedInput({
+                        types: [
+                            {
+                                options: [
+                                    { value: 1, label: "Boolean" },
+                                    // { value: 2, label: "SByte" },
+                                    // { value: 3, label: "Byte" },
+                                    { value: 4, label: "Int16" },
+                                    { value: 5, label: "UInt16" },
+                                    { value: 6, label: "Int32" },
+                                    { value: 7, label: "UInt32" },
+                                    { value: 8, label: "Int64" },
+                                    { value: 9, label: "UInt64" },
+                                    // { value: 10, label: "Float" },
+                                    // { value: 11, label: "Double" },
+                                    { value: 12, label: "String" },
+                                    // { value: 13, label: "DateTime" },
+                                    // { value: 14, label: "Guid" },
+                                    // { value: 15, label: "ByteString" },
+                                    // { value: 16, label: "XmlElement" },
+                                    // { value: 17, label: "NodeId" },
+                                    // { value: 18, label: "ExpandedNodeId" },
+                                    // { value: 19, label: "StatusCode" },
+                                    // { value: 20, label: "QualifiedName" },
+                                    // { value: 21, label: "LocalizedText" },
+                                    // { value: 22, label: "ExtensionObject" }
+                                ]
+                            }
+                        ]
+                    })
 
-                    var position = $('<span style="margin-left: 5px;"> → <span class="node-input-inputArg-index">' + i + '</span> </span>').appendTo(row);
+                    var valueInputField = $('<input type="text" style="flex-grow: 1; margin-right: 5px;" class="node-input-inputArg-value">')
+                        .appendTo(row);
 
-                    var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
-                    valueInput.typedInput({
-                        type: argument.dataType,
-                        types: ["str", "num", "bool"],
-                        typeField: typeField,
-                        onChange: function (dataType, value) {
-                            argument.dataType = dataType;
-                            argument.value = value;
-                            $(container).find('#arg' + i).find('.node-input-value').attr('value', value);
-                            $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
+                    var argIndex = $('<span style="margin-left: 5px;"> → <span class="node-input-inputArg-index">' + i + '</span> </span>')
+                        .appendTo(row);
+
+                    dataTypeField.on('change', function (event, type, value) {
+                        switch (value) {
+                            case 1:
+                                $('.node-input-inputArg-value').attr('type', 'checkbox');
+                                break;
+                            case 4:
+                            case 5:
+                            case 6:
+                            case 7:
+                            case 8:
+                            case 9:
+                                $('.node-input-inputArg-value').attr('type', 'number');
+                                break;
+                            default:
+                                $('.node-input-inputArg-value').attr('type', 'text');
+                                break;
                         }
                     });
+                    // var typeField = $('<input type="hidden" style="flex-grow: 1;" class="node-input-value-type">').appendTo(row);
+                    // valueInput.typedInput({
+                    //     type: argument.dataType,
+                    //     types: ["str", "num", "bool"],
+                    //     typeField: typeField,
+                    //     onChange: function (dataType, value) {
+                    //         argument.dataType = dataType;
+                    //         argument.value = value;
+                    //         $(container).find('#arg' + i).find('.node-input-value').attr('value', value);
+                    //         $(container).find('#arg' + i).find('.node-input-value-type').attr('value', dataType);
+                    //     }
+                    // });
 
                     var rowContainer = row.find('.red-ui-typedInput-container').css('flex-grow', 1);
                 },
@@ -88,7 +139,7 @@
                 removable: true,
                 scrollOnAdd: true,
                 height: "auto",
-                addButton: "Add argument",
+                addButton: "Add",
                 addItem: function (container, i, argument) {
 
                     var row = $('<div id="arg' + i + '" style="overflow: hidden; display: flex; align-items: center;"></div>').appendTo(container);
