@@ -2,7 +2,8 @@
 module.exports = function (RED) {
 
     const {
-        GetClient
+        GetClient,
+        IsValidNodeId
     } = require('./core');
     const {
         AttributeIds,
